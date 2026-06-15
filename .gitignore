@@ -1,0 +1,12 @@
+node_modules/
+dist/
+__pycache__/
+*.pyc
+data/
+.DS_Store
+*.db
+*.db-wal
+*.db-shm
+.env
+backend/data/
+graphify-out/graph.html

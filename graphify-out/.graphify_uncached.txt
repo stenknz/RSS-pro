@@ -1,0 +1,5 @@
+C:\opencode\RSS-Read-Pro\backend\requirements.txt
+C:\opencode\RSS-Read-Pro\docker-compose.yml
+C:\opencode\RSS-Read-Pro\docs\superpowers\plans\2026-06-15-rss-reader-pro-implementation.md
+C:\opencode\RSS-Read-Pro\docs\superpowers\specs\2026-06-15-rss-reader-pro-design.md
+C:\opencode\RSS-Read-Pro\frontend\index.html
