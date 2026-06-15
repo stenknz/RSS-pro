@@ -1,7 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
-  @apply bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100;
+  @apply bg-white dark:bg-[#09090b] text-gray-900 dark:text-gray-100 antialiased;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-200 dark:bg-gray-800 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-300 dark:bg-gray-700;
+}
+
+*:focus-visible {
+  @apply outline-2 outline-offset-2 outline-indigo-500;
 }

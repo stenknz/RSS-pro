@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
@@ -30,7 +30,7 @@ async def refresh_feed(feed_id: int):
         return
     conn.execute(
         "UPDATE feeds SET title = ?, site_url = ?, description = ?, icon_url = ?, error_count = 0, last_fetched_at = ? WHERE id = ?",
-        (parsed.title, parsed.site_url, parsed.description, parsed.icon_url, datetime.now(datetime.UTC).isoformat(), feed_id),
+        (parsed.title, parsed.site_url, parsed.description, parsed.icon_url, datetime.now(timezone.utc).isoformat(), feed_id),
     )
     for article in parsed.articles:
         try:

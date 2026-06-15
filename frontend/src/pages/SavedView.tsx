@@ -24,8 +24,8 @@ export default function SavedView() {
 
   return (
     <div className="flex h-full">
-      <div className="w-80 flex-shrink-0 border-r border-gray-200 dark:border-gray-800 flex flex-col">
-        <div className="p-3 border-b border-gray-200 dark:border-gray-800">
+      <div className="w-80 flex-shrink-0 border-r border-gray-200 dark:border-gray-800 flex flex-col bg-white dark:bg-[#09090b]">
+        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
           <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Saved Articles</h2>
         </div>
         <ArticleList articles={articles} selectedId={selected?.id ?? null} onSelect={setSelected} />

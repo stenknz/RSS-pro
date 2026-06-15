@@ -18,58 +18,56 @@ export default function ReadingPane({ article, onUpdate }: ReadingPaneProps) {
     } catch {}
   }
 
+  const Btn = ({ active, label, activeLabel, onClick, color }: { active: boolean; label: string; activeLabel: string; onClick: () => void; color: string }) => (
+    <button
+      onClick={onClick}
+      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 ${
+        active
+          ? `${color} shadow-sm`
+          : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+      }`}
+    >
+      {active ? activeLabel : label}
+    </button>
+  )
+
   return (
-    <div className="flex-1 overflow-y-auto">
-      <div className="max-w-3xl mx-auto p-6">
+    <div className="flex-1 overflow-y-auto bg-white dark:bg-[#09090b]">
+      <div className="max-w-3xl mx-auto px-8 py-8">
         {article.image_url && (
-          <img src={article.image_url} alt="" className="w-full h-64 object-cover rounded-lg mb-6" />
+          <div className="rounded-xl overflow-hidden mb-8 shadow-sm">
+            <img src={article.image_url} alt="" className="w-full h-72 object-cover" />
+          </div>
         )}
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">{article.title}</h1>
-        <div className="flex items-center gap-3 text-sm text-gray-500 mb-6">
-          <span>{article.feed?.title}</span>
-          {article.author && <span>· {article.author}</span>}
-          {article.published_at && <span>· {new Date(article.published_at).toLocaleDateString()}</span>}
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3 leading-tight tracking-tight">
+          {article.title}
+        </h1>
+        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-8">
+          <span className="font-medium text-indigo-600 dark:text-indigo-400">{article.feed?.title}</span>
+          {article.author && <><span className="text-gray-300 dark:text-gray-600">·</span><span>{article.author}</span></>}
+          {article.published_at && <><span className="text-gray-300 dark:text-gray-600">·</span><span>{new Date(article.published_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</span></>}
         </div>
-        <div className="flex gap-2 mb-6">
-          <button
-            onClick={() => handleToggle('is_read')}
-            className={`px-3 py-1.5 rounded-md text-xs font-medium ${
-              article.is_read ? 'bg-gray-100 dark:bg-gray-800 text-gray-600' : 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-            }`}
-          >
-            {article.is_read ? 'Mark Unread' : 'Mark Read'}
-          </button>
-          <button
-            onClick={() => handleToggle('is_saved')}
-            className={`px-3 py-1.5 rounded-md text-xs font-medium ${
-              article.is_saved ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700' : 'bg-gray-100 dark:bg-gray-800 text-gray-600'
-            }`}
-          >
-            {article.is_saved ? 'Unsave' : 'Save'}
-          </button>
-          <button
-            onClick={() => handleToggle('is_starred')}
-            className={`px-3 py-1.5 rounded-md text-xs font-medium ${
-              article.is_starred ? 'bg-red-100 dark:bg-red-900 text-red-700' : 'bg-gray-100 dark:bg-gray-800 text-gray-600'
-            }`}
-          >
-            {article.is_starred ? 'Unstar' : 'Star'}
-          </button>
+        <div className="flex items-center gap-2 mb-8 flex-wrap">
+          <Btn active={article.is_read} label="Mark Read" activeLabel="Read" onClick={() => handleToggle('is_read')} color="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300" />
+          <Btn active={article.is_saved} label="Save" activeLabel="Saved" onClick={() => handleToggle('is_saved')} color="bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300" />
+          <Btn active={article.is_starred} label="Star" activeLabel="Starred" onClick={() => handleToggle('is_starred')} color="bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300" />
           {article.url && (
             <a
               href={article.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 py-1.5 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 hover:bg-gray-200"
+              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-150"
             >
-              Open Original
+              Open Original &rarr;
             </a>
           )}
         </div>
-        <div
-          className="prose prose-sm dark:prose-invert max-w-none"
-          dangerouslySetInnerHTML={{ __html: article.content || article.summary || '' }}
-        />
+        <div className="border-t border-gray-100 dark:border-gray-800 pt-8">
+          <div
+            className="prose prose-sm dark:prose-invert max-w-none prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-a:text-indigo-600 dark:prose-a:text-indigo-400 prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-strong:text-gray-900 dark:prose-strong:text-gray-100"
+            dangerouslySetInnerHTML={{ __html: article.content || article.summary || '' }}
+          />
+        </div>
       </div>
     </div>
   )

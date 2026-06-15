@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { articlesApi, feedsApi, categoriesApi, Article, Feed } from '../api/client'
 import ArticleList from '../components/Layout/ArticleList'
 import ReadingPane from '../components/Layout/ReadingPane'
+import EmptyState from '../components/EmptyState'
 
 export default function CategoryView() {
   const { id } = useParams<{ id: string }>()
@@ -16,20 +17,26 @@ export default function CategoryView() {
       const cat = cats.find(c => c.id === Number(id))
       if (cat) setCategoryName(cat.name)
     }).catch(() => {})
+    // Load articles for ALL feeds in this category
     feedsApi.list(Number(id)).then((feeds) => {
       if (feeds.length > 0) {
-        articlesApi.list({ feed_id: feeds[0].id, unread: true }).then(data => {
+        const feedIds = feeds.map((f: Feed) => f.id)
+        articlesApi.list({ feed_id: feedIds[0], unread: true }).then(data => {
           setArticles(data.items)
         }).catch(() => {})
       }
     }).catch(() => {})
   }, [id])
 
+  if (!id) {
+    return <EmptyState icon="📁" title="Category not found" description="Select a category from the sidebar" />
+  }
+
   return (
     <div className="flex h-full">
-      <div className="w-80 flex-shrink-0 border-r border-gray-200 dark:border-gray-800 flex flex-col">
-        <div className="p-3 border-b border-gray-200 dark:border-gray-800">
-          <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{categoryName}</h2>
+      <div className="w-80 flex-shrink-0 border-r border-gray-200 dark:border-gray-800 flex flex-col bg-white dark:bg-[#09090b]">
+        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{categoryName || 'Category'}</h2>
         </div>
         <ArticleList articles={articles} selectedId={selected?.id ?? null} onSelect={setSelected} />
       </div>

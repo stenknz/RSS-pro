@@ -52,49 +52,53 @@ export default function FeedManager() {
   }
 
   return (
-    <div className="p-6 overflow-y-auto h-full">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Manage Feeds</h1>
-        <button onClick={() => setShowAdd(!showAdd)} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
-          {showAdd ? 'Cancel' : '+ Add Feed'}
+    <div className="p-8 overflow-y-auto h-full">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">Manage Feeds</h1>
+        <button
+          onClick={() => setShowAdd(!showAdd)}
+          className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
+          {showAdd ? 'Cancel' : 'Add Feed'}
         </button>
       </div>
 
       {showAdd && (
-        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800">
-          <div className="flex gap-2 mb-2">
+        <div className="mb-8 p-5 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800">
+          <div className="flex gap-3">
             <input
               type="url"
               placeholder="RSS Feed URL"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm"
+              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
             <select
               value={catId ?? ''}
               onChange={(e) => setCatId(e.target.value ? Number(e.target.value) : undefined)}
-              className="px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-indigo-500"
             >
               <option value="">No category</option>
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>
-            <button onClick={handleAdd} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">Add</button>
+            <button onClick={handleAdd} className="px-5 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">Add</button>
           </div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
-          <h2 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3">Feeds ({feeds.length})</h2>
-          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800">
+          <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Feeds ({feeds.length})</h2>
+          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm divide-y divide-gray-100 dark:divide-gray-800">
             {feeds.map((feed) => (
-              <div key={feed.id} className="flex items-center gap-3 px-4 py-3 border-b border-gray-100 dark:border-gray-800 last:border-0">
+              <div key={feed.id} className="flex items-center gap-4 px-5 py-4">
                 {feed.icon_url ? (
-                  <img src={feed.icon_url} alt="" className="w-8 h-8 rounded" />
+                  <img src={feed.icon_url} alt="" className="w-9 h-9 rounded-lg" />
                 ) : (
-                  <div className="w-8 h-8 rounded bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-sm text-blue-600 font-bold">
+                  <div className="w-9 h-9 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-sm font-bold text-indigo-600 dark:text-indigo-400">
                     {feed.title[0].toUpperCase()}
                   </div>
                 )}
@@ -102,50 +106,65 @@ export default function FeedManager() {
                   <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{feed.title}</p>
                   <p className="text-xs text-gray-500 truncate">{feed.url}</p>
                   {feed.error_count > 0 && (
-                    <p className="text-xs text-red-500">Errors: {feed.error_count}</p>
+                    <p className="text-xs text-red-500 mt-0.5">{feed.error_count} error{(feed.error_count > 1 ? 's' : '')}</p>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => handleToggle(feed)} className={`px-2 py-1 rounded text-xs font-medium ${feed.enabled ? 'bg-green-100 dark:bg-green-900 text-green-700' : 'bg-gray-100 dark:bg-gray-800 text-gray-500'}`}>
-                    {feed.enabled ? 'On' : 'Off'}
+                  <button
+                    onClick={() => handleToggle(feed)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${feed.enabled ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400' : 'bg-gray-100 dark:bg-gray-800 text-gray-500'}`}
+                  >
+                    {feed.enabled ? 'Enabled' : 'Disabled'}
                   </button>
-                  <button onClick={() => feedsApi.refresh(feed.id)} className="px-2 py-1 rounded text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 hover:bg-gray-200" title="Refresh">
-                    ↻
+                  <button
+                    onClick={() => feedsApi.refresh(feed.id)}
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    title="Refresh"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                   </button>
-                  <button onClick={() => handleDelete(feed.id)} className="px-2 py-1 rounded text-xs bg-red-100 dark:bg-red-900 text-red-600 hover:bg-red-200" title="Delete">
-                    ✕
+                  <button
+                    onClick={() => handleDelete(feed.id)}
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                    title="Delete"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                   </button>
                 </div>
               </div>
             ))}
             {feeds.length === 0 && (
-              <p className="text-sm text-gray-400 p-4 text-center">No feeds yet. Add one above!</p>
+              <p className="text-sm text-gray-400 p-5 text-center">No feeds yet. Add one above!</p>
             )}
           </div>
         </div>
 
         <div>
-          <h2 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3">Categories</h2>
-          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4">
-            <div className="flex gap-2 mb-3">
+          <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Categories</h2>
+          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5 shadow-sm">
+            <div className="flex gap-2 mb-4">
               <input
                 type="text"
                 placeholder="New category"
                 value={newCatName}
                 onChange={(e) => setNewCatName(e.target.value)}
-                className="flex-1 px-2 py-1 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-800 text-xs"
+                className="flex-1 px-2.5 py-1.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-xs focus:ring-2 focus:ring-indigo-500"
               />
-              <button onClick={handleAddCategory} className="px-2 py-1 bg-blue-600 text-white rounded text-xs">Add</button>
+              <button onClick={handleAddCategory} className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-medium hover:bg-indigo-700 transition-colors">Add</button>
             </div>
-            {categories.map((cat) => (
-              <div key={cat.id} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800 last:border-0">
-                <span className="text-sm text-gray-700 dark:text-gray-300">{cat.name} ({cat.feed_count})</span>
-                <button onClick={() => handleDeleteCategory(cat.id)} className="text-xs text-red-500 hover:text-red-700">✕</button>
-              </div>
-            ))}
-            {categories.length === 0 && (
-              <p className="text-xs text-gray-400 text-center">No categories</p>
-            )}
+            <div className="space-y-1">
+              {categories.map((cat) => (
+                <div key={cat.id} className="flex items-center justify-between py-2 px-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                  <span className="text-sm text-gray-700 dark:text-gray-300">{cat.name} <span className="text-gray-400">({cat.feed_count})</span></span>
+                  <button onClick={() => handleDeleteCategory(cat.id)} className="text-gray-400 hover:text-red-500 transition-colors p-1">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+                </div>
+              ))}
+              {categories.length === 0 && (
+                <p className="text-xs text-gray-400 text-center py-4">No categories</p>
+              )}
+            </div>
           </div>
         </div>
       </div>

@@ -7,14 +7,14 @@ interface EmptyStateProps {
 
 export default function EmptyState({ icon = '📭', title, description, action }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center h-full text-center p-8">
-      <div className="text-5xl mb-4">{icon}</div>
-      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">{title}</h3>
-      <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md mb-4">{description}</p>
+    <div className="flex flex-col items-center justify-center h-full text-center px-8">
+      <div className="text-4xl mb-4 opacity-50">{icon}</div>
+      <h3 className="text-base font-semibold text-gray-800 dark:text-gray-200 mb-1.5">{title}</h3>
+      <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm mb-5 leading-relaxed">{description}</p>
       {action && (
         <button
           onClick={action.onClick}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+          className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm"
         >
           {action.label}
         </button>

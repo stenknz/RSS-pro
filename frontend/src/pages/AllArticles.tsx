@@ -9,10 +9,8 @@ export default function AllArticles() {
   const [filter, setFilter] = useState<'all' | 'unread' | 'saved'>('unread')
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
-  const [loading, setLoading] = useState(false)
 
   const load = useCallback(async () => {
-    setLoading(true)
     try {
       const params: any = { page, per_page: 50 }
       if (filter === 'unread') params.unread = true
@@ -21,24 +19,23 @@ export default function AllArticles() {
       setArticles(data.items)
       setTotal(data.total)
     } catch {}
-    setLoading(false)
   }, [filter, page])
 
   useEffect(() => { load() }, [load])
 
   return (
     <div className="flex h-full">
-      <div className="w-80 flex-shrink-0 border-r border-gray-200 dark:border-gray-800 flex flex-col">
-        <div className="p-3 border-b border-gray-200 dark:border-gray-800">
-          <div className="flex gap-1">
+      <div className="w-80 flex-shrink-0 border-r border-gray-200 dark:border-gray-800 flex flex-col bg-white dark:bg-[#09090b]">
+        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+          <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-900 rounded-lg p-0.5">
             {(['all', 'unread', 'saved'] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => { setFilter(f); setPage(1) }}
-                className={`px-3 py-1 rounded-md text-xs font-medium ${
+                className={`flex-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-150 ${
                   filter === f
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-                    : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'
+                    ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                 }`}
               >
                 {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -48,10 +45,22 @@ export default function AllArticles() {
         </div>
         <ArticleList articles={articles} selectedId={selected?.id ?? null} onSelect={setSelected} />
         {total > 50 && (
-          <div className="flex justify-center gap-2 p-3 border-t border-gray-200 dark:border-gray-800">
-            <button disabled={page <= 1} onClick={() => setPage(p => p - 1)} className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 rounded disabled:opacity-50">Prev</button>
-            <span className="text-xs text-gray-500 self-center">{page} / {Math.ceil(total / 50)}</span>
-            <button disabled={page >= Math.ceil(total / 50)} onClick={() => setPage(p => p + 1)} className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 rounded disabled:opacity-50">Next</button>
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-gray-800">
+            <button
+              disabled={page <= 1}
+              onClick={() => setPage(p => p - 1)}
+              className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              Previous
+            </button>
+            <span className="text-xs text-gray-500">{page} of {Math.ceil(total / 50)}</span>
+            <button
+              disabled={page >= Math.ceil(total / 50)}
+              onClick={() => setPage(p => p + 1)}
+              className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              Next
+            </button>
           </div>
         )}
       </div>

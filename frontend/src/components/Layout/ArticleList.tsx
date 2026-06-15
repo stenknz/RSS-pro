@@ -21,30 +21,39 @@ export default function ArticleList({ articles, selectedId, onSelect }: ArticleL
         <div
           key={article.id}
           onClick={() => onSelect(article)}
-          className={`p-4 border-b border-gray-100 dark:border-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors ${
-            selectedId === article.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''
-          } ${!article.is_read ? 'border-l-2 border-l-blue-500' : ''}`}
+          className={`px-4 py-3 border-b border-gray-100 dark:border-gray-800 cursor-pointer transition-all duration-150 hover:bg-gray-50 dark:hover:bg-gray-900 ${
+            selectedId === article.id ? 'bg-indigo-50/50 dark:bg-indigo-950/20' : ''
+          }`}
         >
-          <div className="flex gap-3">
-            {article.image_url && (
-              <img src={article.image_url} alt="" className="w-16 h-16 rounded object-cover flex-shrink-0" />
-            )}
-            <div className="min-w-0 flex-1">
-              <h3 className={`text-sm ${!article.is_read ? 'font-semibold' : 'font-normal'} text-gray-900 dark:text-gray-100 truncate`}>
-                {article.title}
-              </h3>
-              <p className="text-xs text-gray-500 mt-1 line-clamp-2">{article.summary}</p>
-              <div className="flex items-center gap-2 mt-1 text-xs text-gray-400">
-                <span>{article.feed?.title}</span>
-                {article.author && <span>· {article.author}</span>}
-                {article.published_at && (
-                  <span>· {new Date(article.published_at).toLocaleDateString()}</span>
+          <div className={`pl-3 ${!article.is_read ? 'border-l-[3px] border-indigo-500' : 'border-l-[3px] border-transparent'}`}>
+            <div className="flex items-start gap-3">
+              <div className="min-w-0 flex-1">
+                <h3 className={`text-sm leading-snug ${!article.is_read ? 'font-semibold text-gray-900 dark:text-gray-100' : 'font-normal text-gray-700 dark:text-gray-300'}`}>
+                  {article.title}
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1 line-clamp-2 leading-relaxed">{article.summary}</p>
+                <div className="flex items-center gap-2 mt-1.5 text-[11px] text-gray-400 dark:text-gray-500">
+                  <span className="font-medium">{article.feed?.title}</span>
+                  {article.author && <span>· {article.author}</span>}
+                  {article.published_at && (
+                    <span>· {new Date(article.published_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                  )}
+                  {!article.is_read && (
+                    <span className="ml-auto inline-flex items-center gap-1 text-indigo-500 dark:text-indigo-400">
+                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-indigo-400" />
+                      New
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-start gap-1.5 flex-shrink-0 pt-0.5">
+                {article.is_saved && (
+                  <svg className="w-3.5 h-3.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-3-5 3V4z" /></svg>
+                )}
+                {article.is_starred && (
+                  <svg className="w-3.5 h-3.5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
                 )}
               </div>
-            </div>
-            <div className="flex flex-col items-end gap-1 flex-shrink-0">
-              {article.is_saved && <span className="text-yellow-500 text-xs">⭐</span>}
-              {article.is_starred && <span className="text-red-500 text-xs">❤️</span>}
             </div>
           </div>
         </div>
