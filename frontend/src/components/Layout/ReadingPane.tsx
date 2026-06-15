@@ -8,7 +8,11 @@ interface ReadingPaneProps {
 
 export default function ReadingPane({ article, onUpdate }: ReadingPaneProps) {
   if (!article) {
-    return <EmptyState icon="📖" title="Select an article" description="Choose an article from the list to start reading" />
+    return (
+      <div className="flex-1 flex items-center justify-center bg-white dark:bg-[#09090b]">
+        <EmptyState icon="📖" title="Select an article" description="Choose an article from the list to start reading" />
+      </div>
+    )
   }
 
   const handleToggle = async (field: 'is_read' | 'is_saved' | 'is_starred') => {

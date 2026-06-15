@@ -1,6 +1,7 @@
+import asyncio
 from typing import List, Optional
 
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query
 from app.database import get_connection
 from app.models import FeedCreate, FeedUpdate, FeedOut
 from app.services.scheduler import refresh_feed, schedule_feed
@@ -30,7 +31,10 @@ async def create_feed(body: FeedCreate):
             (body.url, body.url, body.category_id),
         )
         conn.commit()
-        row = conn.execute("SELECT * FROM feeds WHERE id = ?", (cur.lastrowid,)).fetchone()
+        feed_id = cur.lastrowid
+        schedule_feed(feed_id, 30)
+        asyncio.ensure_future(refresh_feed(feed_id))
+        row = conn.execute("SELECT * FROM feeds WHERE id = ?", (feed_id,)).fetchone()
         conn.close()
         return dict(row)
     except Exception as e:
@@ -82,18 +86,18 @@ async def delete_feed(feed_id: int):
 
 
 @router.post("/{feed_id}/refresh")
-async def refresh_single_feed(feed_id: int, background_tasks: BackgroundTasks):
+async def refresh_single_feed(feed_id: int):
     conn = get_connection()
     feed = conn.execute("SELECT * FROM feeds WHERE id = ?", (feed_id,)).fetchone()
     conn.close()
     if not feed:
         raise HTTPException(404, "Feed not found")
-    background_tasks.add_task(refresh_feed, feed_id)
+    asyncio.ensure_future(refresh_feed(feed_id))
     return {"message": "Refresh started"}
 
 
 @router.post("/refresh-all")
-async def refresh_all(background_tasks: BackgroundTasks):
+async def refresh_all():
     from app.services.scheduler import refresh_all_feeds
-    background_tasks.add_task(refresh_all_feeds)
+    asyncio.ensure_future(refresh_all_feeds())
     return {"message": "Refresh of all feeds started"}

@@ -33,17 +33,11 @@ export default function ArticleList({ articles, selectedId, onSelect }: ArticleL
                 </h3>
                 <p className="text-xs text-gray-500 dark:text-gray-500 mt-1 line-clamp-2 leading-relaxed">{article.summary}</p>
                 <div className="flex items-center gap-2 mt-1.5 text-[11px] text-gray-400 dark:text-gray-500">
-                  <span className="font-medium">{article.feed?.title}</span>
-                  {article.author && <span>· {article.author}</span>}
-                  {article.published_at && (
-                    <span>· {new Date(article.published_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                  )}
-                  {!article.is_read && (
-                    <span className="ml-auto inline-flex items-center gap-1 text-indigo-500 dark:text-indigo-400">
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-indigo-400" />
-                      New
-                    </span>
-                  )}
+              <span className="font-medium">{article.feed?.title || 'Unknown'}</span>
+              {article.author && <span>· {article.author}</span>}
+              {article.published_at && (
+                <span>· {new Date(article.published_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+              )}
                 </div>
               </div>
               <div className="flex items-start gap-1.5 flex-shrink-0 pt-0.5">

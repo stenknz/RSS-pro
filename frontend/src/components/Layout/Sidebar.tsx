@@ -31,6 +31,7 @@ export default function Sidebar() {
     { path: '/', label: 'Dashboard', icon: icons.dashboard },
     { path: '/articles', label: 'All Articles', icon: icons.articles },
     { path: '/saved', label: 'Saved', icon: icons.saved },
+    { path: '/starred', label: 'Starred', icon: icons.saved },
     { path: '/search', label: 'Search', icon: icons.search },
     { path: '/feeds', label: 'Manage Feeds', icon: icons.feeds },
     { path: '/settings', label: 'Settings', icon: icons.settings },

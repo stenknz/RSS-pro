@@ -1,10 +1,11 @@
+import asyncio
 import xml.etree.ElementTree as ET
 from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException, UploadFile, BackgroundTasks
+from fastapi import APIRouter, HTTPException, UploadFile
 from fastapi.responses import Response
 from app.database import get_connection
-from app.services.scheduler import refresh_feed
+from app.services.scheduler import refresh_feed, schedule_feed
 
 router = APIRouter(prefix="/api/v1/opml", tags=["opml"])
 
@@ -15,7 +16,7 @@ def parse_opml(xml_content: str) -> List[tuple]:
     for elem in root.iter("outline"):
         xml_url = elem.get("xmlUrl")
         if xml_url:
-            category: Optional[str] = None
+            category_name: Optional[str] = None
             parent = None
             for potential_parent in root.iter("outline"):
                 for child in potential_parent:
@@ -25,13 +26,13 @@ def parse_opml(xml_content: str) -> List[tuple]:
                 if parent is not None:
                     break
             if parent is not None:
-                category = parent.get("title") or parent.get("text")
-            outlines.append((xml_url, category))
+                category_name = parent.get("title") or parent.get("text")
+            outlines.append((xml_url, category_name))
     return outlines
 
 
 @router.post("/import", status_code=200)
-async def import_opml(file: UploadFile, background_tasks: BackgroundTasks):
+async def import_opml(file: UploadFile):
     if not file.filename or not file.filename.endswith((".opml", ".xml")):
         raise HTTPException(400, "File must be an OPML file (.opml or .xml)")
     content = await file.read()
@@ -43,27 +44,31 @@ async def import_opml(file: UploadFile, background_tasks: BackgroundTasks):
         raise HTTPException(400, "No feeds found in OPML file")
     conn = get_connection()
     imported = 0
+    skipped = 0
     for url, category_name in outlines:
         category_id = None
         if category_name:
-            existing = conn.execute("SELECT id FROM categories WHERE name = ?", (category_name,)).fetchone()
-            if existing:
-                category_id = existing["id"]
+            row = conn.execute("SELECT id FROM categories WHERE name = ?", (category_name,)).fetchone()
+            if row:
+                category_id = row["id"]
             else:
-                cur = conn.execute("INSERT INTO categories (name) VALUES (?)", (category_name,))
-                category_id = cur.lastrowid
+                conn.execute("INSERT INTO categories (name) VALUES (?)", (category_name,))
+                conn.commit()
+                category_id = conn.execute("SELECT id FROM categories WHERE name = ?", (category_name,)).fetchone()["id"]
         try:
             cur = conn.execute(
                 "INSERT INTO feeds (url, title, category_id) VALUES (?, ?, ?)",
                 (url, url, category_id),
             )
             conn.commit()
-            background_tasks.add_task(refresh_feed, cur.lastrowid)
+            feed_id = cur.lastrowid
+            schedule_feed(feed_id, 30)
+            asyncio.ensure_future(refresh_feed(feed_id))
             imported += 1
         except Exception:
-            conn.rollback()
+            skipped += 1
     conn.close()
-    return {"message": f"Imported {imported} feeds", "total": len(outlines), "imported": imported}
+    return {"message": f"Imported {imported} feeds" + (f", {skipped} duplicates skipped" if skipped else ""), "total": len(outlines), "imported": imported, "skipped": skipped}
 
 
 @router.get("/export")
