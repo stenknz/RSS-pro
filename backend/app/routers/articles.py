@@ -7,6 +7,15 @@ from app.models import ArticleUpdate, SearchQuery
 router = APIRouter(prefix="/api/v1/articles", tags=["articles"])
 
 
+def _row_to_article(row: dict) -> dict:
+    """Convert an SQLite row to a proper article dict with booleans."""
+    d = dict(row)
+    for field in ("is_read", "is_saved", "is_starred"):
+        if field in d:
+            d[field] = bool(d[field])
+    return d
+
+
 @router.get("")
 async def list_articles(
     page: int = Query(1, ge=1),
@@ -58,8 +67,9 @@ async def list_articles(
     items = []
     for r in rows:
         d = dict(r)
-        d["feed"] = {"id": d.pop("feed__id"), "title": d.pop("feed__title"), "icon_url": d.pop("feed__icon_url")}
-        items.append(d)
+        a = _row_to_article(d)
+        a["feed"] = {"id": a.pop("feed__id"), "title": a.pop("feed__title"), "icon_url": a.pop("feed__icon_url")}
+        items.append(a)
     return {"items": items, "total": total, "page": page, "per_page": per_page, "total_pages": total_pages}
 
 
@@ -75,7 +85,7 @@ async def get_article(article_id: int):
     conn.close()
     if not row:
         raise HTTPException(404, "Article not found")
-    d = dict(row)
+    d = _row_to_article(row)
     d["feed"] = {"id": d.pop("feed__id"), "title": d.pop("feed__title"), "icon_url": d.pop("feed__icon_url")}
     return d
 
@@ -104,7 +114,7 @@ async def update_article(article_id: int, body: ArticleUpdate):
         (article_id,),
     ).fetchone()
     conn.close()
-    d = dict(row)
+    d = _row_to_article(row)
     d["feed"] = {"id": d.pop("feed__id"), "title": d.pop("feed__title"), "icon_url": d.pop("feed__icon_url")}
     return d
 
@@ -149,7 +159,7 @@ async def search_articles(body: SearchQuery):
     conn.close()
     items = []
     for r in rows:
-        d = dict(r)
-        d["feed"] = {"id": d.pop("feed__id"), "title": d.pop("feed__title"), "icon_url": d.pop("feed__icon_url")}
-        items.append(d)
+        a = _row_to_article(r)
+        a["feed"] = {"id": a.pop("feed__id"), "title": a.pop("feed__title"), "icon_url": a.pop("feed__icon_url")}
+        items.append(a)
     return {"items": items, "total": total, "page": body.page, "per_page": body.per_page, "total_pages": total_pages}

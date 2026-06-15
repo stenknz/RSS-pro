@@ -40,11 +40,11 @@ export default function ArticleList({ articles, selectedId, onSelect }: ArticleL
               )}
                 </div>
               </div>
-              <div className="flex items-start gap-1.5 flex-shrink-0 pt-0.5">
-                {article.is_saved && (
+              <div className="flex items-start gap-1.5 flex-shrink-0 pt-0.5 min-w-[24px]">
+                {!!article.is_saved && (
                   <svg className="w-3.5 h-3.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-3-5 3V4z" /></svg>
                 )}
-                {article.is_starred && (
+                {!!article.is_starred && (
                   <svg className="w-3.5 h-3.5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
                 )}
               </div>

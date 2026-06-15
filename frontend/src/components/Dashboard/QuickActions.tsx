@@ -14,11 +14,16 @@ export default function QuickActions() {
       const file = (e.target as HTMLInputElement).files?.[0]
       if (file) {
         try {
-          await opmlApi.import(file)
+          const result = await opmlApi.import(file)
           queryClient.invalidateQueries()
-          alert('Feeds imported successfully!')
-        } catch {
-          alert('Failed to import feeds')
+          if (result.imported === 0) {
+            alert('No new feeds found. The feeds may already be in your list.')
+          } else {
+            alert(`Imported ${result.imported} feed${result.imported !== 1 ? 's' : ''} successfully!`)
+          }
+        } catch (e: any) {
+          const msg = e?.response?.data?.detail || e?.message || 'Unknown error'
+          alert(`Failed to import feeds: ${msg}`)
         }
       }
     }

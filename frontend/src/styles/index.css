@@ -28,3 +28,55 @@ body {
 *:focus-visible {
   @apply outline-2 outline-offset-2 outline-indigo-500;
 }
+
+/* Constrain embedded media in article content */
+.prose iframe,
+.prose video,
+.prose object,
+.prose embed {
+  @apply w-full rounded-lg;
+  max-height: 70vh;
+}
+
+.prose iframe[src*="youtube"],
+.prose iframe[src*="youtu.be"],
+.prose iframe[src*="vimeo"] {
+  aspect-ratio: 16 / 9;
+  height: auto;
+}
+
+.prose .player,
+.prose .media-player,
+.prose [class*="player"],
+.prose [class*="media"],
+.prose [class*="video"],
+.prose [class*="embed"] {
+  @apply max-w-full overflow-hidden rounded-lg;
+  line-height: 0;
+}
+
+.prose .player svg,
+.prose .media-player svg,
+.prose [class*="player"] svg,
+.prose [class*="media"] svg,
+.prose [class*="video"] svg {
+  @apply max-w-full;
+  max-height: 200px;
+}
+
+.prose img {
+  @apply rounded-lg max-w-full h-auto;
+}
+
+.prose figure {
+  @apply mx-0 my-4;
+}
+
+.prose figure img {
+  @apply my-0;
+}
+
+.prose .thumbnail,
+.prose [class*="thumb"] {
+  @apply max-w-full rounded-lg;
+}

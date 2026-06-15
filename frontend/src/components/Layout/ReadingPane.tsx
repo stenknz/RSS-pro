@@ -52,9 +52,9 @@ export default function ReadingPane({ article, onUpdate }: ReadingPaneProps) {
           {article.published_at && <><span className="text-gray-300 dark:text-gray-600">·</span><span>{new Date(article.published_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</span></>}
         </div>
         <div className="flex items-center gap-2 mb-8 flex-wrap">
-          <Btn active={article.is_read} label="Mark Read" activeLabel="Read" onClick={() => handleToggle('is_read')} color="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300" />
-          <Btn active={article.is_saved} label="Save" activeLabel="Saved" onClick={() => handleToggle('is_saved')} color="bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300" />
-          <Btn active={article.is_starred} label="Star" activeLabel="Starred" onClick={() => handleToggle('is_starred')} color="bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300" />
+          <Btn active={!!article.is_read} label="Mark Read" activeLabel="Read" onClick={() => handleToggle('is_read')} color="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300" />
+          <Btn active={!!article.is_saved} label="Save" activeLabel="Saved" onClick={() => handleToggle('is_saved')} color="bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300" />
+          <Btn active={!!article.is_starred} label="Star" activeLabel="Starred" onClick={() => handleToggle('is_starred')} color="bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300" />
           {article.url && (
             <a
               href={article.url}
