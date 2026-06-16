@@ -9,6 +9,7 @@ services:
     environment:
       - DATABASE_URL=sqlite:///app/data/rss.db
       - LOG_LEVEL=INFO
+      - FULLTEXT_RSS_URL=http://fullfeedrss/extract.php
     restart: unless-stopped
 
   frontend:
@@ -19,3 +20,16 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+
+  fullfeedrss:
+    image: heussd/fivefilters-full-text-rss:latest
+    container_name: rss-reader-fulltext
+    mem_limit: 512m
+    restart: unless-stopped
+    environment:
+      - FTR_ADMIN_PASSWORD=
+    volumes:
+      - ftr-cache:/var/www/html/cache/rss
+
+volumes:
+  ftr-cache:

@@ -97,6 +97,7 @@ export const articlesApi = {
     api.patch<Article>(`/articles/${id}`, data).then(r => r.data),
   search: (params: { query: string; page?: number; per_page?: number; feed_id?: number; unread?: boolean; saved?: boolean }) =>
     api.post<PaginatedResponse<Article>>('/articles/search', params).then(r => r.data),
+  enrich: (id: number) => api.post<Article>(`/articles/${id}/enrich`).then(r => r.data),
 }
 
 export const opmlApi = {

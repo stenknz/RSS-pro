@@ -1,8 +1,10 @@
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from app.database import get_connection
 from app.models import ArticleUpdate, SearchQuery
+from app.auth import get_current_user
+from app.services.fulltext import enrich_article
 
 router = APIRouter(prefix="/api/v1/articles", tags=["articles"])
 
@@ -115,6 +117,37 @@ async def update_article(article_id: int, body: ArticleUpdate):
     ).fetchone()
     conn.close()
     d = _row_to_article(row)
+    d["feed"] = {"id": d.pop("feed__id"), "title": d.pop("feed__title"), "icon_url": d.pop("feed__icon_url")}
+    return d
+
+
+@router.post("/{article_id}/enrich")
+async def enrich_article_content(article_id: int, user=Depends(get_current_user)):
+    conn = get_connection()
+    row = conn.execute("SELECT * FROM articles WHERE id = ?", (article_id,)).fetchone()
+    if not row:
+        conn.close()
+        raise HTTPException(404, "Article not found")
+    if not row["url"]:
+        conn.close()
+        raise HTTPException(400, "Article has no URL to enrich from")
+
+    content = await enrich_article(row["url"])
+    if not content:
+        conn.close()
+        raise HTTPException(502, "Failed to fetch full text")
+
+    conn.execute("UPDATE articles SET content = ? WHERE id = ?", (content, article_id))
+    conn.commit()
+
+    updated = conn.execute(
+        """SELECT a.*, f.id as feed__id, f.title as feed__title, f.icon_url as feed__icon_url
+           FROM articles a JOIN feeds f ON a.feed_id = f.id
+           WHERE a.id = ?""",
+        (article_id,),
+    ).fetchone()
+    conn.close()
+    d = _row_to_article(updated)
     d["feed"] = {"id": d.pop("feed__id"), "title": d.pop("feed__title"), "icon_url": d.pop("feed__icon_url")}
     return d
 

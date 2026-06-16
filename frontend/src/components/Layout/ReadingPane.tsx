@@ -7,7 +7,6 @@ interface ReadingPaneProps {
   article: Article | null
   onUpdate?: (article: Article) => void
   onBack?: () => void
-  isMobile?: boolean
 }
 
 const widthMap = { normal: 'max-w-3xl', wide: 'max-w-5xl', full: 'max-w-full' }
@@ -18,11 +17,28 @@ export default function ReadingPane({ article, onUpdate, onBack }: ReadingPanePr
   const scrollRef = useRef<HTMLDivElement>(null)
   const { readingWidth, fontSize } = useUIStore()
   const [imgError, setImgError] = useState(false)
+  const [enriching, setEnriching] = useState(false)
+  const [enrichError, setEnrichError] = useState('')
 
   useEffect(() => {
     setImgError(false)
+    setEnrichError('')
     scrollRef.current?.scrollTo(0, 0)
   }, [article?.id])
+
+  const handleEnrich = async () => {
+    if (!article) return
+    setEnriching(true)
+    setEnrichError('')
+    try {
+      const updated = await articlesApi.enrich(article.id)
+      onUpdate?.(updated)
+    } catch {
+      setEnrichError('Failed to fetch full text')
+    } finally {
+      setEnriching(false)
+    }
+  }
 
   if (!article) {
     return (
@@ -85,6 +101,15 @@ export default function ReadingPane({ article, onUpdate, onBack }: ReadingPanePr
           <Btn active={!!article.is_read} label="Mark Read" activeLabel="Read" onClick={() => handleToggle('is_read')} color="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300" />
           <Btn active={!!article.is_saved} label="Save" activeLabel="Saved" onClick={() => handleToggle('is_saved')} color="bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300" />
           <Btn active={!!article.is_starred} label="Star" activeLabel="Starred" onClick={() => handleToggle('is_starred')} color="bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300" />
+          {article.url && !article.content && (
+            <button
+              onClick={handleEnrich}
+              disabled={enriching}
+              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-800/50 transition-all duration-150 disabled:opacity-50"
+            >
+              {enriching ? 'Fetching...' : 'Fetch full text'}
+            </button>
+          )}
           {article.url && (
             <a
               href={article.url}
@@ -96,6 +121,11 @@ export default function ReadingPane({ article, onUpdate, onBack }: ReadingPanePr
             </a>
           )}
         </div>
+        {enrichError && (
+          <div className="mb-6 px-4 py-3 bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-sm rounded-lg">
+            {enrichError}
+          </div>
+        )}
         <div className="border-t border-gray-100 dark:border-gray-800 pt-8">
           <div
             className={`prose ${contentSizeMap[fontSize]} dark:prose-invert max-w-none prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-a:text-indigo-600 dark:prose-a:text-indigo-400 prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-strong:text-gray-900 dark:prose-strong:text-gray-100`}
