@@ -35,6 +35,9 @@ export default function LoginPage() {
             <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none" required />
           </div>
           <button type="submit" className="w-full py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">Sign in</button>
+          <p className="text-xs text-center text-gray-500 dark:text-gray-400 pt-2">
+            No account? <Link to="/register" className="text-indigo-600 dark:text-indigo-400 hover:underline">Create one</Link>
+          </p>
         </form>
       </div>
     </div>
