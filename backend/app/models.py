@@ -101,3 +101,36 @@ class PaginatedResponse(BaseModel):
     page: int
     per_page: int
     total_pages: int
+
+
+class UserOut(BaseModel):
+    id: int
+    username: str
+    is_admin: bool
+
+
+class RegisterBody(BaseModel):
+    username: str
+    password: str
+    invite_token: str | None = None
+
+
+class LoginBody(BaseModel):
+    username: str
+    password: str
+
+
+class LoginResponse(BaseModel):
+    ok: bool
+    user: UserOut
+
+
+class InviteTokenOut(BaseModel):
+    token: str
+    used: bool
+    created_at: str
+
+
+class CreateInviteResponse(BaseModel):
+    token: str
+    url: str
