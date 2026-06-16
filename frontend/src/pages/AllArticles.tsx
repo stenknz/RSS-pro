@@ -16,8 +16,10 @@ export default function AllArticles() {
   const [feedTitle, setFeedTitle] = useState('')
 
   useEffect(() => {
+    setPage(1)
+    setFeedTitle('')
     if (feedId) {
-      feedsApi.get(Number(feedId)).then(f => setFeedTitle(f.title)).catch(() => {})
+      feedsApi.get(Number(feedId)).then(f => setFeedTitle(f.title)).catch(() => setFeedTitle('Unknown feed'))
     }
   }, [feedId])
 

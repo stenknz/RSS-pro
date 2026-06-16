@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Article, articlesApi } from '../../api/client'
 import { useUIStore } from '../../stores/uiStore'
 import EmptyState from '../EmptyState'
@@ -10,13 +10,15 @@ interface ReadingPaneProps {
 
 const widthMap = { normal: 'max-w-3xl', wide: 'max-w-5xl', full: 'max-w-full' }
 const titleSizeMap = { sm: 'text-2xl', base: 'text-3xl', lg: 'text-4xl' }
-const contentSizeMap = { sm: 'text-sm', base: 'text-base', lg: 'text-lg' }
+const contentSizeMap = { sm: 'prose-sm', base: 'prose-base', lg: 'prose-lg' }
 
 export default function ReadingPane({ article, onUpdate }: ReadingPaneProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const { readingWidth, fontSize } = useUIStore()
+  const [imgError, setImgError] = useState(false)
 
   useEffect(() => {
+    setImgError(false)
     scrollRef.current?.scrollTo(0, 0)
   }, [article?.id])
 
@@ -51,13 +53,13 @@ export default function ReadingPane({ article, onUpdate }: ReadingPaneProps) {
   return (
     <div ref={scrollRef} className="flex-1 overflow-y-auto bg-white dark:bg-[#09090b]">
       <div className={`${widthMap[readingWidth]} mx-auto px-8 py-8`}>
-        {article.image_url && (
+        {article.image_url && !imgError && (
           <div className="rounded-xl overflow-hidden mb-8 shadow-sm">
             <img
               src={article.image_url}
               alt=""
               className="w-full h-72 object-cover"
-              onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none' }}
+              onError={() => setImgError(true)}
             />
           </div>
         )}

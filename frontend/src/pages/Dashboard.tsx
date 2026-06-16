@@ -8,18 +8,15 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const [stats, setStats] = useState<Stats | null>(null)
   const [recentFeeds, setRecentFeeds] = useState<Feed[]>([])
+  const [erredImgs, setErredImgs] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     statsApi.get().then(setStats).catch(() => {})
     feedsApi.list().then(setRecentFeeds).catch(() => {})
   }, [])
 
-  const addImgFallback = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const img = e.currentTarget
-    img.style.display = 'none'
-    if (img.nextElementSibling) {
-      (img.nextElementSibling as HTMLElement).style.display = 'flex'
-    }
+  const markImgError = (id: number) => {
+    setErredImgs(prev => new Set(prev).add(id))
   }
 
   return (
@@ -37,18 +34,19 @@ export default function Dashboard() {
               onClick={() => navigate(`/articles?feed_id=${feed.id}`)}
               className="flex items-center gap-3 px-5 py-3.5 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
             >
-              {feed.icon_url ? (
-                <>
-                  <img src={feed.icon_url} alt="" className="w-7 h-7 rounded" onError={addImgFallback} />
-                  <div className="w-7 h-7 rounded bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400" style={{ display: 'none' }}>
-                    {feed.title[0].toUpperCase()}
-                  </div>
-                </>
-              ) : (
+              <div className="relative w-7 h-7 flex-shrink-0">
                 <div className="w-7 h-7 rounded bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400">
                   {feed.title[0].toUpperCase()}
                 </div>
-              )}
+                {feed.icon_url && !erredImgs.has(feed.id) && (
+                  <img
+                    src={feed.icon_url}
+                    alt=""
+                    className="absolute inset-0 w-7 h-7 rounded object-cover"
+                    onError={() => markImgError(feed.id)}
+                  />
+                )}
+              </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{feed.title}</p>
                 <p className="text-xs text-gray-500 truncate">{feed.url}</p>
