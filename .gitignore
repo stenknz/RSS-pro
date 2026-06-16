@@ -9,5 +9,6 @@ data/
 *.db-shm
 .env
 backend/data/
-graphify-out/graph.html
+graphify-out/
+docs/superpowers/
 *.ps1
