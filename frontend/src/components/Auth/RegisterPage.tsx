@@ -18,7 +18,12 @@ export default function RegisterPage() {
       await authApi.register(username, password, token)
       navigate('/login')
     } catch (err: any) {
-      setError(err?.response?.data?.detail || 'Registration failed')
+      const detail = err?.response?.data?.detail
+      if (Array.isArray(detail)) {
+        setError(detail[0]?.msg || 'Invalid input')
+      } else {
+        setError(detail || 'Registration failed')
+      }
     }
   }
 
@@ -35,7 +40,8 @@ export default function RegisterPage() {
           </div>
           <div>
             <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Password</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none" required />
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} minLength={8} className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none" required />
+            <p className="text-xs text-gray-400 mt-1">At least 8 characters</p>
           </div>
           <button type="submit" className="w-full py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">Create account</button>
         </form>
