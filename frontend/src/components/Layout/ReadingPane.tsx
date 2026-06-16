@@ -22,9 +22,13 @@ export default function ReadingPane({ article, onUpdate, onBack }: ReadingPanePr
   const [enrichError, setEnrichError] = useState('')
 
   useEffect(() => {
+    if (!article) return
     setImgError(false)
     setEnrichError('')
     scrollRef.current?.scrollTo(0, 0)
+    if (!article.is_read) {
+      articlesApi.update(article.id, { is_read: true }).then(onUpdate).catch(() => {})
+    }
   }, [article?.id])
 
   const handleEnrich = async () => {
