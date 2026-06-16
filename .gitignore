@@ -10,5 +10,4 @@ data/
 .env
 backend/data/
 graphify-out/
-docs/superpowers/
 *.ps1

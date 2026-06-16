@@ -10,6 +10,7 @@ from app.routers.categories import router as categories_router
 from app.routers.feeds import router as feeds_router
 from app.routers.opml import router as opml_router
 from app.routers.stats import router as stats_router
+from app.routers.auth import router as auth_router
 from app.services.scheduler import scheduler, init_scheduler
 
 
@@ -26,6 +27,7 @@ app = FastAPI(title="RSS Reader Pro", version="1.0.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -35,6 +37,7 @@ app.include_router(categories_router)
 app.include_router(feeds_router)
 app.include_router(opml_router)
 app.include_router(stats_router)
+app.include_router(auth_router)
 
 
 @app.get("/api/v1/health")
