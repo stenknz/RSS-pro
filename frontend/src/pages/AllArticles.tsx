@@ -1,25 +1,37 @@
 import { useEffect, useState, useCallback } from 'react'
-import { articlesApi, Article } from '../api/client'
+import { useSearchParams } from 'react-router-dom'
+import { articlesApi, feedsApi, Article } from '../api/client'
 import ArticleList from '../components/Layout/ArticleList'
 import ReadingPane from '../components/Layout/ReadingPane'
 
 export default function AllArticles() {
+  const [searchParams] = useSearchParams()
+  const feedId = searchParams.get('feed_id')
+
   const [articles, setArticles] = useState<Article[]>([])
   const [selected, setSelected] = useState<Article | null>(null)
-  const [filter, setFilter] = useState<'all' | 'unread' | 'saved'>('unread')
+  const [filter, setFilter] = useState<'all' | 'unread' | 'saved'>(feedId ? 'all' : 'unread')
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
+  const [feedTitle, setFeedTitle] = useState('')
+
+  useEffect(() => {
+    if (feedId) {
+      feedsApi.get(Number(feedId)).then(f => setFeedTitle(f.title)).catch(() => {})
+    }
+  }, [feedId])
 
   const load = useCallback(async () => {
     try {
       const params: any = { page, per_page: 50 }
       if (filter === 'unread') params.unread = true
       if (filter === 'saved') params.saved = true
+      if (feedId) params.feed_id = Number(feedId)
       const data = await articlesApi.list(params)
       setArticles(data.items)
       setTotal(data.total)
     } catch {}
-  }, [filter, page])
+  }, [filter, page, feedId])
 
   useEffect(() => { load() }, [load])
 
@@ -42,8 +54,13 @@ export default function AllArticles() {
               </button>
             ))}
           </div>
+          {feedTitle && (
+            <p className="text-xs text-gray-500 mt-2 px-1">
+              Showing articles from <span className="font-medium text-gray-700 dark:text-gray-300">{feedTitle}</span>
+            </p>
+          )}
         </div>
-        <ArticleList articles={articles} selectedId={selected?.id ?? null} onSelect={setSelected} />
+        <ArticleList articles={articles} selectedId={selected?.id ?? null} onSelect={setSelected} groupByFeed={!feedId} />
         {total > 50 && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-gray-800">
             <button

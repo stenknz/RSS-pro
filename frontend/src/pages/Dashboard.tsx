@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { statsApi, feedsApi, Stats, Feed } from '../api/client'
 import StatsCards from '../components/Dashboard/StatsCards'
 import QuickActions from '../components/Dashboard/QuickActions'
 
 export default function Dashboard() {
+  const navigate = useNavigate()
   const [stats, setStats] = useState<Stats | null>(null)
   const [recentFeeds, setRecentFeeds] = useState<Feed[]>([])
 
@@ -11,6 +13,14 @@ export default function Dashboard() {
     statsApi.get().then(setStats).catch(() => {})
     feedsApi.list().then(setRecentFeeds).catch(() => {})
   }, [])
+
+  const addImgFallback = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget
+    img.style.display = 'none'
+    if (img.nextElementSibling) {
+      (img.nextElementSibling as HTMLElement).style.display = 'flex'
+    }
+  }
 
   return (
     <div className="p-8 overflow-y-auto h-full">
@@ -22,9 +32,18 @@ export default function Dashboard() {
         <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Recent Feeds</h2>
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm divide-y divide-gray-100 dark:divide-gray-800">
           {recentFeeds.slice(0, 10).map((feed) => (
-            <div key={feed.id} className="flex items-center gap-3 px-5 py-3.5">
+            <div
+              key={feed.id}
+              onClick={() => navigate(`/articles?feed_id=${feed.id}`)}
+              className="flex items-center gap-3 px-5 py-3.5 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+            >
               {feed.icon_url ? (
-                <img src={feed.icon_url} alt="" className="w-7 h-7 rounded" />
+                <>
+                  <img src={feed.icon_url} alt="" className="w-7 h-7 rounded" onError={addImgFallback} />
+                  <div className="w-7 h-7 rounded bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400" style={{ display: 'none' }}>
+                    {feed.title[0].toUpperCase()}
+                  </div>
+                </>
               ) : (
                 <div className="w-7 h-7 rounded bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400">
                   {feed.title[0].toUpperCase()}
