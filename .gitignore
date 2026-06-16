@@ -10,3 +10,4 @@ data/
 .env
 backend/data/
 graphify-out/graph.html
+*.ps1

@@ -1,0 +1,24 @@
+services:
+  backend:
+    image: stenknz/rss-pro-backend:latest
+    container_name: rss-reader-backend
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - rss-data:/app/data
+    environment:
+      - DATABASE_URL=sqlite:///app/data/rss.db
+      - LOG_LEVEL=INFO
+    restart: unless-stopped
+
+  frontend:
+    image: stenknz/rss-pro-frontend:latest
+    container_name: rss-reader-frontend
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  rss-data:
