@@ -2,7 +2,18 @@ import axios from 'axios'
 
 const api = axios.create({
   baseURL: '/api/v1',
+  withCredentials: true,
 })
+
+api.interceptors.response.use(
+  (r) => r,
+  (error) => {
+    if (error.response?.status === 401 && !window.location.pathname.startsWith('/login')) {
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  }
+)
 
 export interface Feed {
   id: number
@@ -99,4 +110,14 @@ export const opmlApi = {
 
 export const statsApi = {
   get: () => api.get<Stats>('/stats').then(r => r.data),
+}
+
+export const authApi = {
+  me: () => api.get<{ id: number; username: string; is_admin: boolean }>('/auth/me').then(r => r.data),
+  login: (username: string, password: string) => api.post<{ ok: boolean; user: { id: number; username: string; is_admin: boolean } }>('/auth/login', { username, password }).then(r => r.data),
+  logout: () => api.post('/auth/logout').then(r => r.data),
+  register: (username: string, password: string, invite_token: string) =>
+    api.post('/auth/register', { username, password, invite_token }).then(r => r.data),
+  createInvite: () => api.post<{ token: string; url: string }>('/auth/invites').then(r => r.data),
+  listInvites: () => api.get<{ token: string; used: boolean; created_at: string }[]>('/auth/invites').then(r => r.data),
 }
