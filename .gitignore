@@ -10,4 +10,6 @@ data/
 .env
 backend/data/
 graphify-out/
+.superpowers/
+brainstorm-server.log
 *.ps1
