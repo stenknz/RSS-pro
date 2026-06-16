@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { Article, articlesApi } from '../../api/client'
 import { useUIStore } from '../../stores/uiStore'
 import EmptyState from '../EmptyState'
@@ -12,7 +13,12 @@ const titleSizeMap = { sm: 'text-2xl', base: 'text-3xl', lg: 'text-4xl' }
 const contentSizeMap = { sm: 'text-sm', base: 'text-base', lg: 'text-lg' }
 
 export default function ReadingPane({ article, onUpdate }: ReadingPaneProps) {
+  const scrollRef = useRef<HTMLDivElement>(null)
   const { readingWidth, fontSize } = useUIStore()
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo(0, 0)
+  }, [article?.id])
 
   if (!article) {
     return (
@@ -43,7 +49,7 @@ export default function ReadingPane({ article, onUpdate }: ReadingPaneProps) {
   )
 
   return (
-    <div className="flex-1 overflow-y-auto bg-white dark:bg-[#09090b]">
+    <div ref={scrollRef} className="flex-1 overflow-y-auto bg-white dark:bg-[#09090b]">
       <div className={`${widthMap[readingWidth]} mx-auto px-8 py-8`}>
         {article.image_url && (
           <div className="rounded-xl overflow-hidden mb-8 shadow-sm">
