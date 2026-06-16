@@ -3,7 +3,7 @@ services:
     image: stenknz/rss-pro-backend:latest
     container_name: rss-reader-backend
     ports:
-      - "${BACKEND_PORT:-8000}:8000"
+      - "8000:8000"
     volumes:
       - /volume1/Docker/rss-pro/data:/app/data
     environment:
