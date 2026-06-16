@@ -1,11 +1,13 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useParams, useNavigate } from 'react-router-dom'
 import { articlesApi, feedsApi, Article } from '../api/client'
 import ArticleList from '../components/Layout/ArticleList'
 import ReadingPane from '../components/Layout/ReadingPane'
 
 export default function AllArticles() {
   const [searchParams] = useSearchParams()
+  const { id: articleId } = useParams()
+  const navigate = useNavigate()
   const feedId = searchParams.get('feed_id')
 
   const [articles, setArticles] = useState<Article[]>([])
@@ -37,9 +39,22 @@ export default function AllArticles() {
 
   useEffect(() => { load() }, [load])
 
+  if (articleId) {
+    const article = articles.find(a => a.id === Number(articleId))
+    if (!article) return <div className="p-8 text-sm text-gray-400">Loading...</div>
+    return (
+      <div className="flex h-full">
+        <ReadingPane article={article} onUpdate={(a) => {
+          setArticles(prev => prev.map(p => p.id === a.id ? a : p))
+          setSelected(a)
+        }} onBack={() => navigate('/articles')} />
+      </div>
+    )
+  }
+
   return (
     <div className="flex h-full">
-      <div className="w-80 flex-shrink-0 border-r border-gray-200 dark:border-gray-800 flex flex-col bg-white dark:bg-[#09090b]">
+      <div className="hidden md:flex w-80 flex-shrink-0 border-r border-gray-200 dark:border-gray-800 flex-col bg-white dark:bg-[#09090b]">
         <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-900 rounded-lg p-0.5">
             {(['all', 'unread', 'saved'] as const).map((f) => (
@@ -62,7 +77,12 @@ export default function AllArticles() {
             </p>
           )}
         </div>
-        <ArticleList articles={articles} selectedId={selected?.id ?? null} onSelect={setSelected} groupByFeed={!feedId} />
+        <ArticleList articles={articles} selectedId={selected?.id ?? null} onSelect={(article) => {
+          setSelected(article)
+          if (window.innerWidth < 768) {
+            navigate(`/articles/${article.id}`)
+          }
+        }} groupByFeed={!feedId} />
         {total > 50 && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-gray-800">
             <button

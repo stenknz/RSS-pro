@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { articlesApi, feedsApi, categoriesApi, Article, Feed } from '../api/client'
 import ArticleList from '../components/Layout/ArticleList'
 import ReadingPane from '../components/Layout/ReadingPane'
@@ -7,6 +7,7 @@ import EmptyState from '../components/EmptyState'
 
 export default function CategoryView() {
   const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
   const [articles, setArticles] = useState<Article[]>([])
   const [selected, setSelected] = useState<Article | null>(null)
   const [categoryName, setCategoryName] = useState('')
@@ -38,7 +39,12 @@ export default function CategoryView() {
         <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
           <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{categoryName || 'Category'}</h2>
         </div>
-        <ArticleList articles={articles} selectedId={selected?.id ?? null} onSelect={setSelected} />
+        <ArticleList articles={articles} selectedId={selected?.id ?? null} onSelect={(article) => {
+            setSelected(article)
+            if (window.innerWidth < 768) {
+              navigate(`/articles/${article.id}`)
+            }
+          }} />
       </div>
       <ReadingPane article={selected} onUpdate={(a) => {
         setArticles(prev => prev.map(p => p.id === a.id ? a : p))

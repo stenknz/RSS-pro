@@ -20,7 +20,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="p-8 overflow-y-auto h-full">
+    <div className="p-4 md:p-8 overflow-y-auto h-full">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8 tracking-tight">Dashboard</h1>
       <StatsCards stats={stats} />
       <QuickActions />

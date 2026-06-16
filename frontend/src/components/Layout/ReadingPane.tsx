@@ -6,13 +6,15 @@ import EmptyState from '../EmptyState'
 interface ReadingPaneProps {
   article: Article | null
   onUpdate?: (article: Article) => void
+  onBack?: () => void
+  isMobile?: boolean
 }
 
 const widthMap = { normal: 'max-w-3xl', wide: 'max-w-5xl', full: 'max-w-full' }
 const titleSizeMap = { sm: 'text-2xl', base: 'text-3xl', lg: 'text-4xl' }
 const contentSizeMap = { sm: 'prose-sm', base: 'prose-base', lg: 'prose-lg' }
 
-export default function ReadingPane({ article, onUpdate }: ReadingPaneProps) {
+export default function ReadingPane({ article, onUpdate, onBack }: ReadingPaneProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const { readingWidth, fontSize } = useUIStore()
   const [imgError, setImgError] = useState(false)
@@ -52,7 +54,15 @@ export default function ReadingPane({ article, onUpdate }: ReadingPaneProps) {
 
   return (
     <div ref={scrollRef} className="flex-1 overflow-y-auto bg-white dark:bg-[#09090b]">
-      <div className={`${widthMap[readingWidth]} mx-auto px-8 py-8`}>
+      <div className={`${widthMap[readingWidth]} mx-auto px-4 md:px-8 py-8`}>
+        {onBack && (
+          <button onClick={onBack} className="md:hidden flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 mb-4 hover:text-gray-700 dark:hover:text-gray-300">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
+        )}
         {article.image_url && !imgError && (
           <div className="rounded-xl overflow-hidden mb-8 shadow-sm">
             <img

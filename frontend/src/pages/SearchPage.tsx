@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { articlesApi, Article } from '../api/client'
 import ArticleList from '../components/Layout/ArticleList'
 import ReadingPane from '../components/Layout/ReadingPane'
 import EmptyState from '../components/EmptyState'
 
 export default function SearchPage() {
+  const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [articles, setArticles] = useState<Article[]>([])
   const [selected, setSelected] = useState<Article | null>(null)
@@ -48,7 +50,12 @@ export default function SearchPage() {
         {searched && articles.length === 0 ? (
           <EmptyState icon="🔍" title="No results" description={`No articles found for "${query}"`} />
         ) : (
-          <ArticleList articles={articles} selectedId={selected?.id ?? null} onSelect={setSelected} />
+          <ArticleList articles={articles} selectedId={selected?.id ?? null} onSelect={(article) => {
+            setSelected(article)
+            if (window.innerWidth < 768) {
+              navigate(`/articles/${article.id}`)
+            }
+          }} />
         )}
       </div>
       <ReadingPane article={selected} onUpdate={(a) => {
