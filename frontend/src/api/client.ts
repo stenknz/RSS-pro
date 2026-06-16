@@ -90,7 +90,7 @@ export const categoriesApi = {
 }
 
 export const articlesApi = {
-  list: (params?: { feed_id?: number; category_id?: number; unread?: boolean; saved?: boolean; starred?: boolean; page?: number; per_page?: number }) =>
+  list: (params?: { feed_id?: number; category_id?: number; unread?: boolean; saved?: boolean; starred?: boolean; read_today?: boolean; page?: number; per_page?: number }) =>
     api.get<PaginatedResponse<Article>>('/articles', { params }).then(r => r.data),
   get: (id: number) => api.get<Article>(`/articles/${id}`).then(r => r.data),
   update: (id: number, data: { is_read?: boolean; is_saved?: boolean; is_starred?: boolean }) =>

@@ -9,10 +9,11 @@ export default function AllArticles() {
   const { id: articleId } = useParams()
   const navigate = useNavigate()
   const feedId = searchParams.get('feed_id')
+  const readToday = searchParams.get('read_today')
 
   const [articles, setArticles] = useState<Article[]>([])
   const [selected, setSelected] = useState<Article | null>(null)
-  const [filter, setFilter] = useState<'all' | 'unread' | 'saved'>(feedId ? 'all' : 'unread')
+  const [filter, setFilter] = useState<'all' | 'unread' | 'saved'>(readToday ? 'all' : feedId ? 'all' : 'unread')
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
   const [feedTitle, setFeedTitle] = useState('')
@@ -31,6 +32,7 @@ export default function AllArticles() {
       if (filter === 'unread') params.unread = true
       if (filter === 'saved') params.saved = true
       if (feedId) params.feed_id = Number(feedId)
+      if (readToday) params.read_today = true
       const data = await articlesApi.list(params)
       setArticles(data.items)
       setTotal(data.total)

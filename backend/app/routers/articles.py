@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -27,6 +28,7 @@ async def list_articles(
     unread: Optional[bool] = Query(None),
     saved: Optional[bool] = Query(None),
     starred: Optional[bool] = Query(None),
+    read_today: Optional[bool] = Query(None),
 ):
     conn = get_connection()
     conditions = []
@@ -46,6 +48,10 @@ async def list_articles(
     if starred is not None:
         conditions.append("a.is_starred = ?")
         params.append(int(starred))
+    if read_today:
+        today = datetime.utcnow().strftime("%Y-%m-%d")
+        conditions.append("a.is_read = 1 AND date(a.created_at) = ?")
+        params.append(today)
     where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
 
     count_row = conn.execute(
