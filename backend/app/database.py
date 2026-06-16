@@ -58,6 +58,7 @@ def init_db():
                 image_url TEXT,
                 published_at TEXT,
                 is_read INTEGER NOT NULL DEFAULT 0,
+                read_at TEXT,
                 is_saved INTEGER NOT NULL DEFAULT 0,
                 is_starred INTEGER NOT NULL DEFAULT 0,
                 created_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -123,6 +124,10 @@ def init_db():
         cols = [r["name"] for r in cursor.fetchall()]
         if "expires_at" not in cols:
             conn.execute("ALTER TABLE invite_tokens ADD COLUMN expires_at TEXT NOT NULL DEFAULT (datetime('now', '+7 days'))")
+        cursor = conn.execute("PRAGMA table_info(articles)")
+        cols = [r["name"] for r in cursor.fetchall()]
+        if "read_at" not in cols:
+            conn.execute("ALTER TABLE articles ADD COLUMN read_at TEXT")
         conn.commit()
         conn.commit()
     finally:

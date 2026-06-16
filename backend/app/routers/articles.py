@@ -48,9 +48,9 @@ async def list_articles(
     if starred is not None:
         conditions.append("a.is_starred = ?")
         params.append(int(starred))
-    if read_today:
+    if read_today is not None:
         today = datetime.utcnow().strftime("%Y-%m-%d")
-        conditions.append("a.is_read = 1 AND date(a.created_at) = ?")
+        conditions.append("a.is_read = 1 AND date(a.read_at) = ?")
         params.append(today)
     where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
 
@@ -110,6 +110,8 @@ async def update_article(article_id: int, body: ArticleUpdate):
         val = getattr(body, field, None)
         if val is not None:
             updates[field] = int(val)
+    if body.is_read is True:
+        updates["read_at"] = datetime.utcnow().isoformat()
     if body.is_starred is False:
         updates["content"] = None
     if updates:

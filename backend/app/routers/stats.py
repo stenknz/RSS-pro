@@ -17,7 +17,7 @@ async def get_stats():
     starred_count = conn.execute("SELECT COUNT(*) as c FROM articles WHERE is_starred = 1").fetchone()["c"]
     today = datetime.utcnow().strftime("%Y-%m-%d")
     read_today = conn.execute(
-        "SELECT COUNT(*) as c FROM articles WHERE is_read = 1 AND date(created_at) = ?", (today,)
+        "SELECT COUNT(*) as c FROM articles WHERE is_read = 1 AND date(read_at) = ?", (today,)
     ).fetchone()["c"]
     conn.close()
     return {

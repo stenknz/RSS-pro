@@ -24,7 +24,7 @@ export default function AllArticles() {
     if (feedId) {
       feedsApi.get(Number(feedId)).then(f => setFeedTitle(f.title)).catch(() => setFeedTitle('Unknown feed'))
     }
-  }, [feedId])
+  }, [feedId, readToday])
 
   const load = useCallback(async () => {
     try {
@@ -36,8 +36,11 @@ export default function AllArticles() {
       const data = await articlesApi.list(params)
       setArticles(data.items)
       setTotal(data.total)
-    } catch {}
-  }, [filter, page, feedId])
+    } catch {
+      setArticles([])
+      setTotal(0)
+    }
+  }, [filter, page, feedId, readToday])
 
   useEffect(() => { load() }, [load])
 
@@ -62,7 +65,7 @@ export default function AllArticles() {
             {(['all', 'unread', 'saved'] as const).map((f) => (
               <button
                 key={f}
-                onClick={() => { setFilter(f); setPage(1) }}
+                onClick={() => { setFilter(f); setPage(1); if (readToday) navigate('/articles') }}
                 className={`flex-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-150 ${
                   filter === f
                     ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm'
