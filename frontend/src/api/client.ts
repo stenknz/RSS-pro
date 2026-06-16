@@ -98,6 +98,7 @@ export const articlesApi = {
   search: (params: { query: string; page?: number; per_page?: number; feed_id?: number; unread?: boolean; saved?: boolean }) =>
     api.post<PaginatedResponse<Article>>('/articles/search', params).then(r => r.data),
   enrich: (id: number) => api.post<Article>(`/articles/${id}/enrich`).then(r => r.data),
+  cleanupContent: () => api.post<{ cleared: number; remaining_with_content: number }>('/articles/cleanup-content').then(r => r.data),
 }
 
 export const opmlApi = {

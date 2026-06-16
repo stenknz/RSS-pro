@@ -104,6 +104,8 @@ async def update_article(article_id: int, body: ArticleUpdate):
         val = getattr(body, field, None)
         if val is not None:
             updates[field] = int(val)
+    if body.is_starred is False:
+        updates["content"] = None
     if updates:
         set_clause = ", ".join(f"{k} = ?" for k in updates)
         values = list(updates.values()) + [article_id]
@@ -150,6 +152,24 @@ async def enrich_article_content(article_id: int, user=Depends(get_current_user)
     d = _row_to_article(updated)
     d["feed"] = {"id": d.pop("feed__id"), "title": d.pop("feed__title"), "icon_url": d.pop("feed__icon_url")}
     return d
+
+
+@router.post("/cleanup-content")
+async def cleanup_content(user=Depends(get_current_user)):
+    conn = get_connection()
+    result = conn.execute(
+        "UPDATE articles SET content = NULL WHERE content IS NOT NULL AND is_starred = 0"
+    )
+    conn.commit()
+    affected = result.rowcount
+    conn.close()
+
+    conn = get_connection()
+    result = conn.execute("SELECT COUNT(*) as c FROM articles WHERE content IS NOT NULL")
+    remaining = result.fetchone()["c"]
+    conn.close()
+
+    return {"cleared": affected, "remaining_with_content": remaining}
 
 
 @router.post("/search")

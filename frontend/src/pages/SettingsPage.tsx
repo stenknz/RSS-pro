@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useUIStore } from '../stores/uiStore'
-import { authApi } from '../api/client'
+import { authApi, articlesApi } from '../api/client'
 
 export default function SettingsPage() {
   const { theme, setTheme, readingWidth, setReadingWidth, fontSize, setFontSize } = useUIStore()
@@ -12,6 +12,22 @@ export default function SettingsPage() {
       authApi.listInvites().then(setInvites).catch(() => {})
     }
   }, [showInvites])
+
+  const [cleanupMsg, setCleanupMsg] = useState('')
+
+  const handleCleanupContent = async () => {
+    setCleanupMsg('')
+    try {
+      const result = await articlesApi.cleanupContent()
+      if (result.cleared > 0) {
+        setCleanupMsg(`Cleared ${result.cleared} articles. ${result.remaining_with_content} starred articles still have full text.`)
+      } else {
+        setCleanupMsg('No non-starred articles had full text to clear.')
+      }
+    } catch {
+      setCleanupMsg('Failed to clean up content.')
+    }
+  }
 
   const handleGenerateInvite = async () => {
     try {
@@ -78,6 +94,13 @@ export default function SettingsPage() {
               <span>Export OPML</span>
               <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 11l5-5 5 5M12 4v11" /></svg>
             </button>
+            <div className="px-5 py-4 space-y-2">
+              <p className="text-xs text-gray-500 dark:text-gray-400">Full-text fetched via FiveFilters is stored in the database. Clear it for non-starred articles to free up space.</p>
+              <button onClick={handleCleanupContent} className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                Clean up content
+              </button>
+              {cleanupMsg && <p className="text-xs text-gray-500 dark:text-gray-400">{cleanupMsg}</p>}
+            </div>
           </div>
         </section>
 
