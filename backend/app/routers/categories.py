@@ -1,10 +1,11 @@
 from typing import List
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from app.database import get_connection
 from app.models import CategoryCreate, CategoryUpdate, CategoryOut
+from app.auth import get_current_user
 
-router = APIRouter(prefix="/api/v1/categories", tags=["categories"])
+router = APIRouter(prefix="/api/v1/categories", tags=["categories"], dependencies=[Depends(get_current_user)])
 
 
 @router.get("", response_model=List[CategoryOut])
@@ -40,7 +41,7 @@ async def create_category(body: CategoryCreate):
         conn.close()
         if "UNIQUE" in str(e):
             raise HTTPException(409, "Category already exists")
-        raise HTTPException(400, str(e))
+        raise HTTPException(400, "Failed to create category")
 
 
 @router.put("/{category_id}", response_model=CategoryOut)
@@ -66,7 +67,7 @@ async def update_category(category_id: int, body: CategoryUpdate):
         conn.close()
         if "UNIQUE" in str(e):
             raise HTTPException(409, "Category name already exists")
-        raise HTTPException(400, str(e))
+        raise HTTPException(400, "Failed to update category")
 
 
 @router.delete("/{category_id}", status_code=204)

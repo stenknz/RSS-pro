@@ -119,6 +119,11 @@ def init_db():
             CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expires_at);
             CREATE INDEX IF NOT EXISTS idx_invite_tokens_token ON invite_tokens(token);
         """)
+        cursor = conn.execute("PRAGMA table_info(invite_tokens)")
+        cols = [r["name"] for r in cursor.fetchall()]
+        if "expires_at" not in cols:
+            conn.execute("ALTER TABLE invite_tokens ADD COLUMN expires_at TEXT NOT NULL DEFAULT (datetime('now', '+7 days'))")
+        conn.commit()
         conn.commit()
     finally:
         conn.close()

@@ -1,11 +1,26 @@
 import secrets
+from time import time
+from datetime import datetime
 import bcrypt
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 
+from app.config import settings
 from app.database import get_connection
 from app.models import RegisterBody, LoginBody
 from app.auth import create_session, get_current_user, require_admin
+
+_login_attempts: dict[str, list[float]] = {}
+
+def _check_login_rate(ip: str) -> None:
+    now = time()
+    if ip not in _login_attempts:
+        _login_attempts[ip] = []
+    _login_attempts[ip] = [t for t in _login_attempts[ip] if now - t < 60]
+    if len(_login_attempts[ip]) >= 5:
+        raise HTTPException(status_code=429, detail="Too many login attempts. Try again in a minute.")
+    _login_attempts[ip].append(now)
+
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
@@ -20,11 +35,11 @@ def register(body: RegisterBody):
             if not body.invite_token:
                 raise HTTPException(status_code=400, detail="Invite token required")
             invite = conn.execute(
-                "SELECT id FROM invite_tokens WHERE token = ? AND used_by IS NULL",
+                "SELECT id FROM invite_tokens WHERE token = ? AND used_by IS NULL AND expires_at > datetime('now')",
                 (body.invite_token,),
             ).fetchone()
             if not invite:
-                raise HTTPException(status_code=400, detail="Invalid or used invite token")
+                raise HTTPException(status_code=400, detail="Invalid or expired invite token")
 
         existing = conn.execute(
             "SELECT id FROM users WHERE username = ?", (body.username,)
@@ -52,7 +67,8 @@ def register(body: RegisterBody):
 
 
 @router.post("/login")
-def login(body: LoginBody):
+def login(body: LoginBody, request: Request):
+    _check_login_rate(request.client.host)
     conn = get_connection()
     try:
         row = conn.execute(
@@ -69,7 +85,8 @@ def login(body: LoginBody):
         })
         resp.set_cookie(
             key="rss_session", value=token, httponly=True,
-            samesite="lax", max_age=2592000, path="/",
+            samesite="lax", secure=settings.secure_cookies,
+            max_age=2592000, path="/",
         )
         return resp
     finally:
@@ -77,7 +94,13 @@ def login(body: LoginBody):
 
 
 @router.post("/logout")
-def logout():
+def logout(request: Request, user=Depends(get_current_user)):
+    token = request.cookies.get("rss_session")
+    if token:
+        conn = get_connection()
+        conn.execute("DELETE FROM sessions WHERE token = ?", (token,))
+        conn.commit()
+        conn.close()
     resp = JSONResponse({"ok": True})
     resp.delete_cookie(key="rss_session", path="/")
     return resp
@@ -94,7 +117,7 @@ def create_invite(user=Depends(require_admin)):
     conn = get_connection()
     try:
         conn.execute(
-            "INSERT INTO invite_tokens (token, created_by) VALUES (?, ?)",
+            "INSERT INTO invite_tokens (token, created_by, expires_at) VALUES (?, ?, datetime('now', '+7 days'))",
             (token, user.id),
         )
         conn.commit()
@@ -108,8 +131,14 @@ def list_invites(user=Depends(require_admin)):
     conn = get_connection()
     try:
         rows = conn.execute(
-            "SELECT token, used_by, created_at FROM invite_tokens ORDER BY created_at DESC"
+            "SELECT token, used_by, created_at, expires_at FROM invite_tokens ORDER BY created_at DESC"
         ).fetchall()
-        return [{"token": r["token"], "used": r["used_by"] is not None, "created_at": r["created_at"]} for r in rows]
+        now = datetime.utcnow().isoformat()
+        return [{
+            "token": r["token"][:8] + "...",
+            "used": r["used_by"] is not None,
+            "created_at": r["created_at"],
+            "expired": r["expires_at"] < now,
+        } for r in rows]
     finally:
         conn.close()

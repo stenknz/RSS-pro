@@ -1,4 +1,4 @@
-import uuid
+import secrets
 from datetime import datetime, timedelta
 
 from fastapi import Request, Depends, HTTPException, status
@@ -8,7 +8,7 @@ from app.models import UserOut
 
 
 def create_session(user_id: int) -> str:
-    token = str(uuid.uuid4())
+    token = secrets.token_urlsafe(32)
     expires_at = (datetime.utcnow() + timedelta(days=30)).isoformat()
     conn = get_connection()
     try:
@@ -28,6 +28,7 @@ def get_current_user(request: Request) -> UserOut:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     conn = get_connection()
     try:
+        conn.execute("DELETE FROM sessions WHERE expires_at <= datetime('now')")
         row = conn.execute(
             """
             SELECT u.id, u.username, u.is_admin

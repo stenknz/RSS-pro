@@ -2,12 +2,13 @@ import asyncio
 import xml.etree.ElementTree as ET
 from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from fastapi.responses import Response
 from app.database import get_connection
+from app.auth import get_current_user
 from app.services.scheduler import refresh_feed, schedule_feed
 
-router = APIRouter(prefix="/api/v1/opml", tags=["opml"])
+router = APIRouter(prefix="/api/v1/opml", tags=["opml"], dependencies=[Depends(get_current_user)])
 
 
 def parse_opml(xml_content: str) -> List[tuple]:

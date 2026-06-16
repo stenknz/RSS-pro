@@ -12,8 +12,8 @@ OPML_CONTENT = """<?xml version="1.0" encoding="UTF-8"?>
 
 
 @pytest.mark.asyncio
-async def test_import_opml(client):
-    resp = await client.post(
+async def test_import_opml(auth_client):
+    resp = await auth_client.post(
         "/api/v1/opml/import",
         files={"file": ("feeds.opml", OPML_CONTENT, "application/xml")},
     )
@@ -23,8 +23,8 @@ async def test_import_opml(client):
 
 
 @pytest.mark.asyncio
-async def test_export_opml(client):
-    await client.post("/api/v1/feeds", json={"url": "https://example.com/rss"})
-    resp = await client.get("/api/v1/opml/export")
+async def test_export_opml(auth_client):
+    await auth_client.post("/api/v1/feeds", json={"url": "https://example.com/rss"})
+    resp = await auth_client.get("/api/v1/opml/export")
     assert resp.status_code == 200
     assert b"<opml" in resp.content

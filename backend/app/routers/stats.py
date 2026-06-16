@@ -1,9 +1,10 @@
 from datetime import datetime
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from app.database import get_connection
+from app.auth import get_current_user
 
-router = APIRouter(prefix="/api/v1/stats", tags=["stats"])
+router = APIRouter(prefix="/api/v1/stats", tags=["stats"], dependencies=[Depends(get_current_user)])
 
 
 @router.get("")

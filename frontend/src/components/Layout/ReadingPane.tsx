@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import DOMPurify from 'dompurify'
 import { Article, articlesApi } from '../../api/client'
 import { useUIStore } from '../../stores/uiStore'
 import EmptyState from '../EmptyState'
@@ -129,7 +130,7 @@ export default function ReadingPane({ article, onUpdate, onBack }: ReadingPanePr
         <div className="border-t border-gray-100 dark:border-gray-800 pt-8">
           <div
             className={`prose ${contentSizeMap[fontSize]} dark:prose-invert max-w-none prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-a:text-indigo-600 dark:prose-a:text-indigo-400 prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-strong:text-gray-900 dark:prose-strong:text-gray-100`}
-            dangerouslySetInnerHTML={{ __html: article.content || article.summary || '' }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content || article.summary || '') }}
           />
         </div>
       </div>

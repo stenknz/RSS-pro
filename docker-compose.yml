@@ -20,7 +20,7 @@ services:
     restart: unless-stopped
 
   fullfeedrss:
-    image: heussd/fivefilters-full-text-rss:latest
+    image: heussd/fivefilters-full-text-rss:3.8.1
     mem_limit: 512m
     restart: unless-stopped
     environment:

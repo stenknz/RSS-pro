@@ -2,15 +2,15 @@ import pytest
 
 
 @pytest.mark.asyncio
-async def test_list_articles_empty(client):
-    resp = await client.get("/api/v1/articles")
+async def test_list_articles_empty(auth_client):
+    resp = await auth_client.get("/api/v1/articles")
     assert resp.status_code == 200
     assert resp.json()["total"] == 0
 
 
 @pytest.mark.asyncio
-async def test_list_articles_with_data(client):
-    await client.post("/api/v1/feeds", json={"url": "https://example.com/rss"})
+async def test_list_articles_with_data(auth_client):
+    await auth_client.post("/api/v1/feeds", json={"url": "https://example.com/rss"})
     from app.database import get_connection
     conn = get_connection()
     feed_id = conn.execute("SELECT id FROM feeds LIMIT 1").fetchone()["id"]
@@ -20,7 +20,7 @@ async def test_list_articles_with_data(client):
     )
     conn.commit()
     conn.close()
-    resp = await client.get("/api/v1/articles")
+    resp = await auth_client.get("/api/v1/articles")
     assert resp.status_code == 200
     data = resp.json()
     assert data["total"] == 1
@@ -28,8 +28,8 @@ async def test_list_articles_with_data(client):
 
 
 @pytest.mark.asyncio
-async def test_mark_read(client):
-    await client.post("/api/v1/feeds", json={"url": "https://example.com/rss"})
+async def test_mark_read(auth_client):
+    await auth_client.post("/api/v1/feeds", json={"url": "https://example.com/rss"})
     from app.database import get_connection
     conn = get_connection()
     feed_id = conn.execute("SELECT id FROM feeds LIMIT 1").fetchone()["id"]
@@ -40,20 +40,20 @@ async def test_mark_read(client):
     conn.commit()
     article_id = conn.execute("SELECT id FROM articles LIMIT 1").fetchone()["id"]
     conn.close()
-    resp = await client.patch(f"/api/v1/articles/{article_id}", json={"is_read": True})
+    resp = await auth_client.patch(f"/api/v1/articles/{article_id}", json={"is_read": True})
     assert resp.status_code == 200
     assert resp.json()["is_read"] == True
 
 
 @pytest.mark.asyncio
-async def test_get_article_not_found(client):
-    resp = await client.get("/api/v1/articles/99999")
+async def test_get_article_not_found(auth_client):
+    resp = await auth_client.get("/api/v1/articles/99999")
     assert resp.status_code == 404
 
 
 @pytest.mark.asyncio
-async def test_search_articles(client):
-    await client.post("/api/v1/feeds", json={"url": "https://example.com/rss"})
+async def test_search_articles(auth_client):
+    await auth_client.post("/api/v1/feeds", json={"url": "https://example.com/rss"})
     from app.database import get_connection
     conn = get_connection()
     feed_id = conn.execute("SELECT id FROM feeds LIMIT 1").fetchone()["id"]
@@ -63,6 +63,6 @@ async def test_search_articles(client):
     )
     conn.commit()
     conn.close()
-    resp = await client.post("/api/v1/articles/search", json={"query": "Python"})
+    resp = await auth_client.post("/api/v1/articles/search", json={"query": "Python"})
     assert resp.status_code == 200
     assert resp.json()["total"] >= 1

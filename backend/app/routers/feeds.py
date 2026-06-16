@@ -1,12 +1,13 @@
 import asyncio
 from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from app.database import get_connection
 from app.models import FeedCreate, FeedUpdate, FeedOut
+from app.auth import get_current_user
 from app.services.scheduler import refresh_feed, schedule_feed
 
-router = APIRouter(prefix="/api/v1/feeds", tags=["feeds"])
+router = APIRouter(prefix="/api/v1/feeds", tags=["feeds"], dependencies=[Depends(get_current_user)])
 
 
 @router.get("", response_model=List[FeedOut])
@@ -41,7 +42,7 @@ async def create_feed(body: FeedCreate):
         conn.close()
         if "UNIQUE" in str(e):
             raise HTTPException(409, "Feed URL already exists")
-        raise HTTPException(400, str(e))
+        raise HTTPException(400, "Failed to create feed")
 
 
 @router.get("/{feed_id}", response_model=FeedOut)

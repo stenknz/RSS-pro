@@ -6,7 +6,7 @@ from app.models import ArticleUpdate, SearchQuery
 from app.auth import get_current_user
 from app.services.fulltext import enrich_article
 
-router = APIRouter(prefix="/api/v1/articles", tags=["articles"])
+router = APIRouter(prefix="/api/v1/articles", tags=["articles"], dependencies=[Depends(get_current_user)])
 
 
 def _row_to_article(row: dict) -> dict:
