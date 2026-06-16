@@ -7,7 +7,7 @@ from app.database import get_connection
 from app.models import RegisterBody, LoginBody
 from app.auth import create_session, get_current_user, require_admin
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
 
 @router.post("/register")
