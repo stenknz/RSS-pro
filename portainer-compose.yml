@@ -15,7 +15,7 @@ services:
     image: stenknz/rss-pro-frontend:latest
     container_name: rss-reader-frontend
     ports:
-      - "${FRONTEND_PORT:-8383}:80"
+      - "8383:80"
     depends_on:
       - backend
     restart: unless-stopped
