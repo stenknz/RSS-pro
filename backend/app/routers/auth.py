@@ -1,7 +1,7 @@
 import secrets
+import bcrypt
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
-from passlib.hash import bcrypt
 
 from app.database import get_connection
 from app.models import RegisterBody, LoginBody
@@ -35,7 +35,7 @@ def register(body: RegisterBody):
         is_admin = user_count == 0
         conn.execute(
             "INSERT INTO users (username, password_hash, is_admin) VALUES (?, ?, ?)",
-            (body.username, bcrypt.hash(body.password), 1 if is_admin else 0),
+            (body.username, bcrypt.hashpw(body.password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8"), 1 if is_admin else 0),
         )
         conn.commit()
 
@@ -59,7 +59,7 @@ def login(body: LoginBody):
             "SELECT id, username, password_hash, is_admin FROM users WHERE username = ?",
             (body.username,),
         ).fetchone()
-        if not row or not bcrypt.verify(body.password, row["password_hash"]):
+        if not row or not bcrypt.checkpw(body.password.encode("utf-8"), row["password_hash"].encode("utf-8")):
             raise HTTPException(status_code=401, detail="Invalid username or password")
 
         token = create_session(row["id"])
