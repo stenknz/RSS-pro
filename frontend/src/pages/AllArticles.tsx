@@ -54,7 +54,7 @@ export default function AllArticles() {
 
   return (
     <div className="flex h-full">
-      <div className="hidden md:flex w-80 flex-shrink-0 border-r border-gray-200 dark:border-gray-800 flex-col bg-white dark:bg-[#09090b]">
+      <div className="flex w-full md:w-80 flex-shrink-0 border-r border-gray-200 dark:border-gray-800 flex-col bg-white dark:bg-[#09090b]">
         <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-900 rounded-lg p-0.5">
             {(['all', 'unread', 'saved'] as const).map((f) => (
