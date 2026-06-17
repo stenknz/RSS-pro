@@ -94,16 +94,17 @@ export default function ReadingPane({ article, onUpdate, onBack }: ReadingPanePr
             />
           </div>
         )}
-        <h1 className={`${titleSizeMap[fontSize]} font-bold text-gray-900 dark:text-gray-100 mb-3 leading-tight tracking-tight`}>
+        <h1 className={`${titleSizeMap[fontSize]} font-semibold font-serif text-gray-900 dark:text-gray-100 mb-4 leading-tight tracking-tight`}>
           {article.title}
         </h1>
         <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-8">
-          <span className="font-medium text-indigo-600 dark:text-indigo-400">{article.feed?.title}</span>
+          <div className="w-2 h-2 rounded-full bg-accent-500 flex-shrink-0" />
+          <span className="font-semibold text-accent-600 dark:text-accent-400 uppercase tracking-wider text-xs">{article.feed?.title}</span>
           {article.author && <><span className="text-gray-300 dark:text-gray-600">·</span><span>{article.author}</span></>}
           {article.published_at && <><span className="text-gray-300 dark:text-gray-600">·</span><span>{new Date(article.published_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</span></>}
         </div>
         <div className="flex items-center gap-2 mb-8 flex-wrap">
-          <Btn active={!!article.is_read} label="Mark Read" activeLabel="Read" onClick={() => handleToggle('is_read')} color="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300" />
+          <Btn active={!!article.is_read} label="Mark Read" activeLabel="Read" onClick={() => handleToggle('is_read')} color="bg-accent-100 dark:bg-accent-900/50 text-accent-700 dark:text-accent-300" />
           <Btn active={!!article.is_saved} label="Save" activeLabel="Saved" onClick={() => handleToggle('is_saved')} color="bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300" />
           <Btn active={!!article.is_starred} label="Star" activeLabel="Starred" onClick={() => handleToggle('is_starred')} color="bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300" />
           {article.url && !article.content && (
@@ -133,7 +134,7 @@ export default function ReadingPane({ article, onUpdate, onBack }: ReadingPanePr
         )}
         <div className="border-t border-gray-100 dark:border-gray-800 pt-8">
           <div
-            className={`prose ${contentSizeMap[fontSize]} dark:prose-invert max-w-none prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-a:text-indigo-600 dark:prose-a:text-indigo-400 prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-strong:text-gray-900 dark:prose-strong:text-gray-100`}
+            className={`prose ${contentSizeMap[fontSize]} dark:prose-invert max-w-none prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-a:text-accent-600 dark:prose-a:text-accent-400 prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-strong:text-gray-900 dark:prose-strong:text-gray-100 prose-headings:font-serif prose-p:font-serif`}
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content || article.summary || '') }}
           />
         </div>

@@ -10,7 +10,7 @@ export default function MobileTopBar() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
-      <h1 className="text-sm font-bold tracking-tight text-indigo-600 dark:text-indigo-400">RSS Reader</h1>
+      <h1 className="text-sm font-bold tracking-tight font-serif text-accent-600 dark:text-accent-400">RSS Reader</h1>
       <div className="w-8" />
     </div>
   )

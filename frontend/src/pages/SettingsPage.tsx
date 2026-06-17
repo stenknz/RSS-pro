@@ -54,7 +54,7 @@ export default function SettingsPage() {
               <select
                 value={theme}
                 onChange={(e) => setTheme(e.target.value as 'light' | 'dark')}
-                className="px-3 py-1.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-indigo-500"
+                className="px-3 py-1.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-accent-500"
               >
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
@@ -65,7 +65,7 @@ export default function SettingsPage() {
               <select
                 value={readingWidth}
                 onChange={(e) => setReadingWidth(e.target.value as 'normal' | 'wide' | 'full')}
-                className="px-3 py-1.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-indigo-500"
+                className="px-3 py-1.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-accent-500"
               >
                 <option value="normal">Normal</option>
                 <option value="wide">Wide</option>
@@ -77,7 +77,7 @@ export default function SettingsPage() {
               <select
                 value={fontSize}
                 onChange={(e) => setFontSize(e.target.value as 'sm' | 'base' | 'lg')}
-                className="px-3 py-1.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-indigo-500"
+                className="px-3 py-1.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-accent-500"
               >
                 <option value="sm">Small</option>
                 <option value="base">Medium</option>
@@ -108,14 +108,14 @@ export default function SettingsPage() {
           <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Invites</h2>
           <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm divide-y divide-gray-100 dark:divide-gray-800">
             <div className="px-5 py-4">
-              <button onClick={() => setShowInvites(!showInvites)} className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline">
+              <button onClick={() => setShowInvites(!showInvites)} className="text-sm font-medium text-accent-600 dark:text-accent-400 hover:underline">
                 {showInvites ? 'Hide' : 'Manage'} invite links
               </button>
             </div>
             {showInvites && (
               <>
                 <div className="px-5 py-3">
-                  <button onClick={handleGenerateInvite} className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">
+                  <button onClick={handleGenerateInvite} className="px-4 py-2 bg-accent-600 text-white rounded-lg text-sm font-medium hover:bg-accent-700 transition-colors">
                     Generate new invite link
                   </button>
                 </div>

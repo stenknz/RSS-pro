@@ -43,7 +43,7 @@ export default function Sidebar() {
   return (
     <div className="h-full flex flex-col bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800">
       <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">
-        <h1 className="text-base font-bold tracking-tight text-indigo-600 dark:text-indigo-400">
+        <h1 className="text-base font-bold tracking-tight font-serif text-accent-600 dark:text-accent-400">
           RSS Reader
         </h1>
       </div>
@@ -55,7 +55,7 @@ export default function Sidebar() {
             to={link.path}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
               location.pathname === link.path
-                ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300'
+                ? 'bg-accent-50 dark:bg-accent-950/50 text-accent-700 dark:text-accent-300'
                 : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 hover:text-gray-900 dark:hover:text-gray-200'
             }`}
           >
@@ -72,7 +72,7 @@ export default function Sidebar() {
             to="/articles"
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-150 ${
               location.pathname === '/articles'
-                ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300'
+                ? 'bg-accent-50 dark:bg-accent-950/50 text-accent-700 dark:text-accent-300'
                 : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 hover:text-gray-900 dark:hover:text-gray-200'
             }`}
           >
@@ -90,7 +90,7 @@ export default function Sidebar() {
               to={`/category/${cat.id}`}
               className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-150 ${
                 location.pathname === `/category/${cat.id}`
-                  ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300'
+                  ? 'bg-accent-50 dark:bg-accent-950/50 text-accent-700 dark:text-accent-300'
                   : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 hover:text-gray-900 dark:hover:text-gray-200'
               }`}
             >

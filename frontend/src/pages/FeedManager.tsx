@@ -57,7 +57,7 @@ export default function FeedManager() {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">Manage Feeds</h1>
         <button
           onClick={() => setShowAdd(!showAdd)}
-          className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm"
+          className="inline-flex items-center gap-1.5 px-4 py-2 bg-accent-600 text-white rounded-lg text-sm font-medium hover:bg-accent-700 transition-colors shadow-sm"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
           {showAdd ? 'Cancel' : 'Add Feed'}
@@ -72,19 +72,19 @@ export default function FeedManager() {
               placeholder="RSS Feed URL"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-accent-500 focus:border-transparent"
             />
             <select
               value={catId ?? ''}
               onChange={(e) => setCatId(e.target.value ? Number(e.target.value) : undefined)}
-              className="px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-indigo-500"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-accent-500"
             >
               <option value="">No category</option>
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>
-            <button onClick={handleAdd} className="px-5 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">Add</button>
+            <button onClick={handleAdd} className="px-5 py-2 bg-accent-600 text-white rounded-lg text-sm font-medium hover:bg-accent-700 transition-colors">Add</button>
           </div>
         </div>
       )}
@@ -98,7 +98,7 @@ export default function FeedManager() {
                 {feed.icon_url ? (
                   <img src={feed.icon_url} alt="" className="w-9 h-9 rounded-lg" />
                 ) : (
-                  <div className="w-9 h-9 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                  <div className="w-9 h-9 rounded-lg bg-accent-100 dark:bg-accent-900/50 flex items-center justify-center text-sm font-bold text-accent-600 dark:text-accent-400">
                     {feed.title[0].toUpperCase()}
                   </div>
                 )}
@@ -148,9 +148,9 @@ export default function FeedManager() {
                 placeholder="New category"
                 value={newCatName}
                 onChange={(e) => setNewCatName(e.target.value)}
-                className="flex-1 px-2.5 py-1.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-xs focus:ring-2 focus:ring-indigo-500"
+                className="flex-1 px-2.5 py-1.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-xs focus:ring-2 focus:ring-accent-500"
               />
-              <button onClick={handleAddCategory} className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-medium hover:bg-indigo-700 transition-colors">Add</button>
+              <button onClick={handleAddCategory} className="px-3 py-1.5 bg-accent-600 text-white rounded-lg text-xs font-medium hover:bg-accent-700 transition-colors">Add</button>
             </div>
             <div className="space-y-1">
               {categories.map((cat) => (

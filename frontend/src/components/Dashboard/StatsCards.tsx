@@ -9,7 +9,7 @@ export default function StatsCards({ stats }: StatsCardsProps) {
   const navigate = useNavigate()
   if (!stats) return null
   const cards: { label: string; value: number; color: string; to: string | null }[] = [
-    { label: 'Total Feeds', value: stats.total_feeds, color: 'text-indigo-600 dark:text-indigo-400', to: null },
+    { label: 'Total Feeds', value: stats.total_feeds, color: 'text-accent-600 dark:text-accent-400', to: null },
     { label: 'Unread', value: stats.unread_count, color: 'text-amber-600 dark:text-amber-400', to: '/articles?unread=true' },
     { label: 'Read Today', value: stats.read_today, color: 'text-emerald-600 dark:text-emerald-400', to: '/articles?read_today=true' },
     { label: 'Saved', value: stats.saved_count, color: 'text-violet-600 dark:text-violet-400', to: '/articles?saved=true' },

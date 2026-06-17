@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -26,7 +24,7 @@ body {
 }
 
 *:focus-visible {
-  @apply outline-2 outline-offset-2 outline-indigo-500;
+  @apply outline-2 outline-offset-2 outline-accent-500;
 }
 
 /* Constrain embedded media in article content */

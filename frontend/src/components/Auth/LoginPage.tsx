@@ -28,15 +28,15 @@ export default function LoginPage() {
           {error && <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 px-3 py-2 rounded-lg">{error}</p>}
           <div>
             <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Username</label>
-            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none" required />
+            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-accent-500 focus:border-transparent outline-none" required />
           </div>
           <div>
             <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Password</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none" required />
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-accent-500 focus:border-transparent outline-none" required />
           </div>
-          <button type="submit" className="w-full py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">Sign in</button>
+          <button type="submit" className="w-full py-2 bg-accent-600 text-white rounded-lg text-sm font-medium hover:bg-accent-700 transition-colors">Sign in</button>
           <p className="text-xs text-center text-gray-500 dark:text-gray-400 pt-2">
-            No account? <Link to="/register" className="text-indigo-600 dark:text-indigo-400 hover:underline">Create one</Link>
+            No account? <Link to="/register" className="text-accent-600 dark:text-accent-400 hover:underline">Create one</Link>
           </p>
         </form>
       </div>

@@ -35,7 +35,7 @@ export default function Dashboard() {
               className="flex items-center gap-3 px-5 py-3.5 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
             >
               <div className="relative w-7 h-7 flex-shrink-0">
-                <div className="w-7 h-7 rounded bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                <div className="w-7 h-7 rounded flex items-center justify-center text-xs font-bold text-white bg-accent-500">
                   {feed.title[0].toUpperCase()}
                 </div>
                 {feed.icon_url && !erredImgs.has(feed.id) && (
