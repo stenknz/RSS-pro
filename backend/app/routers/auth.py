@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 
 from app.config import settings
 from app.database import get_connection
-from app.models import RegisterBody, LoginBody
+from app.models import RegisterBody
 from app.auth import create_session, get_current_user, require_admin
 
 _login_attempts: dict[str, list[float]] = {}
@@ -67,15 +67,15 @@ def register(body: RegisterBody):
 
 
 @router.post("/login")
-def login(body: LoginBody, request: Request):
+def login(body: dict, request: Request):
     _check_login_rate(request.client.host)
     conn = get_connection()
     try:
         row = conn.execute(
             "SELECT id, username, password_hash, is_admin FROM users WHERE username = ?",
-            (body.username,),
+            (body.get("username", ""),),
         ).fetchone()
-        if not row or not bcrypt.checkpw(body.password.encode("utf-8"), row["password_hash"].encode("utf-8")):
+        if not row or not bcrypt.checkpw(body.get("password", "").encode("utf-8"), row["password_hash"].encode("utf-8")):
             raise HTTPException(status_code=401, detail="Invalid username or password")
 
         token = create_session(row["id"])

@@ -1,15 +1,13 @@
-from pydantic_settings import BaseSettings
+from os import environ
 
 
-class Settings(BaseSettings):
-    database_url: str = "sqlite:///./data/rss.db"
-    log_level: str = "INFO"
-    default_refresh_interval: int = 30
-    fulltext_rss_url: str = "http://fullfeedrss/extract.php"
-    secure_cookies: bool = False
-    cors_origins: str = "http://localhost:80,http://localhost:5173,http://localhost:8383,http://127.0.0.1:80,http://127.0.0.1:5173,http://127.0.0.1:8383"
-
-    model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+class Settings:
+    database_url: str = environ.get("DATABASE_URL", "sqlite:///./data/rss.db")
+    log_level: str = environ.get("LOG_LEVEL", "INFO")
+    default_refresh_interval: int = int(environ.get("DEFAULT_REFRESH_INTERVAL", "30"))
+    fulltext_rss_url: str = environ.get("FULLTEXT_RSS_URL", "http://fullfeedrss/extract.php")
+    secure_cookies: bool = environ.get("SECURE_COOKIES", "False").lower() == "true"
+    cors_origins: str = environ.get("CORS_ORIGINS", "http://localhost:80,http://localhost:5173,http://localhost:8383,http://127.0.0.1:80,http://127.0.0.1:5173,http://127.0.0.1:8383")
 
 
 settings = Settings()

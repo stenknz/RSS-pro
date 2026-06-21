@@ -1,34 +1,5 @@
-from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, HttpUrl, field_validator
-
-
-class CategoryCreate(BaseModel):
-    name: str
-
-
-class CategoryUpdate(BaseModel):
-    name: str
-
-
-class CategoryOut(BaseModel):
-    id: int
-    name: str
-    feed_count: int = 0
-    created_at: str
-
-
-class FeedCreate(BaseModel):
-    url: str
-    category_id: Optional[int] = None
-
-
-class FeedUpdate(BaseModel):
-    title: Optional[str] = None
-    url: Optional[str] = None
-    category_id: Optional[int] = None
-    refresh_interval: Optional[int] = None
-    enabled: Optional[bool] = None
+from pydantic import BaseModel, field_validator
 
 
 class FeedOut(BaseModel):
@@ -44,12 +15,6 @@ class FeedOut(BaseModel):
     error_count: int
     last_fetched_at: Optional[str] = None
     created_at: str
-
-
-class FeedSummary(BaseModel):
-    id: int
-    title: str
-    icon_url: Optional[str] = None
 
 
 class ArticleUpdate(BaseModel):
@@ -73,7 +38,24 @@ class ArticleOut(BaseModel):
     is_saved: bool
     is_starred: bool
     created_at: str
-    feed: Optional[FeedSummary] = None
+    feed: Optional[dict] = None
+
+
+class CategoryOut(BaseModel):
+    id: int
+    name: str
+    feed_count: int = 0
+    created_at: str
+
+
+class SearchQuery(BaseModel):
+    query: str
+    page: int = 1
+    per_page: int = 50
+    feed_id: Optional[int] = None
+    category_id: Optional[int] = None
+    unread: Optional[bool] = None
+    saved: Optional[bool] = None
 
 
 class SearchQuery(BaseModel):
@@ -120,24 +102,3 @@ class RegisterBody(BaseModel):
         if len(v) < 8:
             raise ValueError("Password must be at least 8 characters")
         return v
-
-
-class LoginBody(BaseModel):
-    username: str
-    password: str
-
-
-class LoginResponse(BaseModel):
-    ok: bool
-    user: UserOut
-
-
-class InviteTokenOut(BaseModel):
-    token: str
-    used: bool
-    created_at: str
-
-
-class CreateInviteResponse(BaseModel):
-    token: str
-    url: str

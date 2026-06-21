@@ -12,7 +12,7 @@ from app.routers.feeds import router as feeds_router
 from app.routers.opml import router as opml_router
 from app.routers.stats import router as stats_router
 from app.routers.auth import router as auth_router
-from app.services.scheduler import scheduler, init_scheduler
+from app.services.scheduler import init_scheduler, shutdown_scheduler
 
 
 @asynccontextmanager
@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
     await asyncio.to_thread(init_db)
     init_scheduler()
     yield
-    scheduler.shutdown()
+    shutdown_scheduler()
 
 
 app = FastAPI(title="RSS Reader Pro", version="1.0.0", lifespan=lifespan)

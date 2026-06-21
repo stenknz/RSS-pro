@@ -1,8 +1,8 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Body
 from app.database import get_connection
-from app.models import CategoryCreate, CategoryUpdate, CategoryOut
+from app.models import CategoryOut
 from app.auth import get_current_user
 
 router = APIRouter(prefix="/api/v1/categories", tags=["categories"], dependencies=[Depends(get_current_user)])
@@ -23,10 +23,10 @@ async def list_categories():
 
 
 @router.post("", response_model=CategoryOut, status_code=201)
-async def create_category(body: CategoryCreate):
+async def create_category(name: str = Body(..., embed=True)):
     conn = get_connection()
     try:
-        cur = conn.execute("INSERT INTO categories (name) VALUES (?)", (body.name.strip(),))
+        cur = conn.execute("INSERT INTO categories (name) VALUES (?)", (name.strip(),))
         conn.commit()
         row = conn.execute("""
             SELECT c.*, COUNT(f.id) as feed_count
@@ -45,10 +45,10 @@ async def create_category(body: CategoryCreate):
 
 
 @router.put("/{category_id}", response_model=CategoryOut)
-async def update_category(category_id: int, body: CategoryUpdate):
+async def update_category(category_id: int, name: str = Body(..., embed=True)):
     conn = get_connection()
     try:
-        conn.execute("UPDATE categories SET name = ? WHERE id = ?", (body.name.strip(), category_id))
+        conn.execute("UPDATE categories SET name = ? WHERE id = ?", (name.strip(), category_id))
         conn.commit()
         row = conn.execute("""
             SELECT c.*, COUNT(f.id) as feed_count

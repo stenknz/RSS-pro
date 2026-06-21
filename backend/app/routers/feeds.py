@@ -1,9 +1,9 @@
 import asyncio
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Body
 from app.database import get_connection
-from app.models import FeedCreate, FeedUpdate, FeedOut
+from app.models import FeedOut
 from app.auth import get_current_user
 from app.services.scheduler import refresh_feed, schedule_feed
 
@@ -24,12 +24,12 @@ async def list_feeds(category_id: Optional[int] = Query(None)):
 
 
 @router.post("", response_model=FeedOut, status_code=201)
-async def create_feed(body: FeedCreate):
+async def create_feed(url: str = Body(...), category_id: Optional[int] = Body(None)):
     conn = get_connection()
     try:
         cur = conn.execute(
             "INSERT INTO feeds (url, title, category_id) VALUES (?, ?, ?)",
-            (body.url, body.url, body.category_id),
+            (url, url, category_id),
         )
         conn.commit()
         feed_id = cur.lastrowid
@@ -56,16 +56,15 @@ async def get_feed(feed_id: int):
 
 
 @router.put("/{feed_id}", response_model=FeedOut)
-async def update_feed(feed_id: int, body: FeedUpdate):
+async def update_feed(feed_id: int, body: dict):
     conn = get_connection()
     feed = conn.execute("SELECT * FROM feeds WHERE id = ?", (feed_id,)).fetchone()
     if not feed:
         conn.close()
         raise HTTPException(404, "Feed not found")
-    feed = dict(feed)
     updates = {}
     for field in ("title", "url", "category_id", "refresh_interval", "enabled"):
-        val = getattr(body, field, None)
+        val = body.get(field)
         if val is not None:
             updates[field] = val
     if updates:

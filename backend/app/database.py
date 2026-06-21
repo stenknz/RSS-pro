@@ -129,6 +129,5 @@ def init_db():
         if "read_at" not in cols:
             conn.execute("ALTER TABLE articles ADD COLUMN read_at TEXT")
         conn.commit()
-        conn.commit()
     finally:
         conn.close()

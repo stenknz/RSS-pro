@@ -10,12 +10,19 @@ from app.services.fulltext import enrich_article
 router = APIRouter(prefix="/api/v1/articles", tags=["articles"], dependencies=[Depends(get_current_user)])
 
 
-def _row_to_article(row: dict) -> dict:
-    """Convert an SQLite row to a proper article dict with booleans."""
+def _read_article(conn, article_id: int) -> dict | None:
+    row = conn.execute(
+        """SELECT a.*, f.id as feed__id, f.title as feed__title, f.icon_url as feed__icon_url
+           FROM articles a JOIN feeds f ON a.feed_id = f.id
+           WHERE a.id = ?""",
+        (article_id,),
+    ).fetchone()
+    if not row:
+        return None
     d = dict(row)
     for field in ("is_read", "is_saved", "is_starred"):
-        if field in d:
-            d[field] = bool(d[field])
+        d[field] = bool(d[field])
+    d["feed"] = {"id": d.pop("feed__id"), "title": d.pop("feed__title"), "icon_url": d.pop("feed__icon_url")}
     return d
 
 
@@ -75,27 +82,21 @@ async def list_articles(
     items = []
     for r in rows:
         d = dict(r)
-        a = _row_to_article(d)
-        a["feed"] = {"id": a.pop("feed__id"), "title": a.pop("feed__title"), "icon_url": a.pop("feed__icon_url")}
-        items.append(a)
+        for field in ("is_read", "is_saved", "is_starred"):
+            d[field] = bool(d[field])
+        d["feed"] = {"id": d.pop("feed__id"), "title": d.pop("feed__title"), "icon_url": d.pop("feed__icon_url")}
+        items.append(d)
     return {"items": items, "total": total, "page": page, "per_page": per_page, "total_pages": total_pages}
 
 
 @router.get("/{article_id}")
 async def get_article(article_id: int):
     conn = get_connection()
-    row = conn.execute(
-        """SELECT a.*, f.id as feed__id, f.title as feed__title, f.icon_url as feed__icon_url
-           FROM articles a JOIN feeds f ON a.feed_id = f.id
-           WHERE a.id = ?""",
-        (article_id,),
-    ).fetchone()
+    article = _read_article(conn, article_id)
     conn.close()
-    if not row:
+    if not article:
         raise HTTPException(404, "Article not found")
-    d = _row_to_article(row)
-    d["feed"] = {"id": d.pop("feed__id"), "title": d.pop("feed__title"), "icon_url": d.pop("feed__icon_url")}
-    return d
+    return article
 
 
 @router.patch("/{article_id}")
@@ -119,22 +120,15 @@ async def update_article(article_id: int, body: ArticleUpdate):
         values = list(updates.values()) + [article_id]
         conn.execute(f"UPDATE articles SET {set_clause} WHERE id = ?", values)
         conn.commit()
-    row = conn.execute(
-        """SELECT a.*, f.id as feed__id, f.title as feed__title, f.icon_url as feed__icon_url
-           FROM articles a JOIN feeds f ON a.feed_id = f.id
-           WHERE a.id = ?""",
-        (article_id,),
-    ).fetchone()
+    article = _read_article(conn, article_id)
     conn.close()
-    d = _row_to_article(row)
-    d["feed"] = {"id": d.pop("feed__id"), "title": d.pop("feed__title"), "icon_url": d.pop("feed__icon_url")}
-    return d
+    return article
 
 
 @router.post("/{article_id}/enrich")
 async def enrich_article_content(article_id: int, user=Depends(get_current_user)):
     conn = get_connection()
-    row = conn.execute("SELECT * FROM articles WHERE id = ?", (article_id,)).fetchone()
+    row = conn.execute("SELECT url FROM articles WHERE id = ?", (article_id,)).fetchone()
     if not row:
         conn.close()
         raise HTTPException(404, "Article not found")
@@ -149,17 +143,9 @@ async def enrich_article_content(article_id: int, user=Depends(get_current_user)
 
     conn.execute("UPDATE articles SET content = ? WHERE id = ?", (content, article_id))
     conn.commit()
-
-    updated = conn.execute(
-        """SELECT a.*, f.id as feed__id, f.title as feed__title, f.icon_url as feed__icon_url
-           FROM articles a JOIN feeds f ON a.feed_id = f.id
-           WHERE a.id = ?""",
-        (article_id,),
-    ).fetchone()
+    article = _read_article(conn, article_id)
     conn.close()
-    d = _row_to_article(updated)
-    d["feed"] = {"id": d.pop("feed__id"), "title": d.pop("feed__title"), "icon_url": d.pop("feed__icon_url")}
-    return d
+    return article
 
 
 @router.post("/cleanup-content")
@@ -170,13 +156,8 @@ async def cleanup_content(user=Depends(get_current_user)):
     )
     conn.commit()
     affected = result.rowcount
+    remaining = conn.execute("SELECT COUNT(*) as c FROM articles WHERE content IS NOT NULL").fetchone()["c"]
     conn.close()
-
-    conn = get_connection()
-    result = conn.execute("SELECT COUNT(*) as c FROM articles WHERE content IS NOT NULL")
-    remaining = result.fetchone()["c"]
-    conn.close()
-
     return {"cleared": affected, "remaining_with_content": remaining}
 
 
@@ -220,7 +201,9 @@ async def search_articles(body: SearchQuery):
     conn.close()
     items = []
     for r in rows:
-        a = _row_to_article(r)
-        a["feed"] = {"id": a.pop("feed__id"), "title": a.pop("feed__title"), "icon_url": a.pop("feed__icon_url")}
-        items.append(a)
+        d = dict(r)
+        for field in ("is_read", "is_saved", "is_starred"):
+            d[field] = bool(d[field])
+        d["feed"] = {"id": d.pop("feed__id"), "title": d.pop("feed__title"), "icon_url": d.pop("feed__icon_url")}
+        items.append(d)
     return {"items": items, "total": total, "page": body.page, "per_page": body.per_page, "total_pages": total_pages}
